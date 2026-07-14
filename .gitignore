@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Secrets — Supabase keys, Anthropic API key (phase 2). Never commit these.
+.env
+.env.*
+!.env.example
+
+# Real student data must never enter git. Grades live in Supabase only.
+# Any local export/backup goes here and stays out of the repo.
+/private/
+*.local.csv
+
+# Node (only if a tool step is ever added)
+node_modules/

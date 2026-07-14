@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mrs. H's Mustang Tracker — Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Gochi+Hand&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #16294d;        /* Mustang blue, deep */
+    --blue: #2455a4;        /* Mustang blue, bright */
+    --red: #c8102e;         /* Mustang red */
+    --red-soft: #fde8ec;
+    --blue-soft: #e7f0fc;
+    --gold-line: #e3e9f4;
+    --paper: #ffffff;
+    --cream: #f7faff;
+    --muted: #64749b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Fredoka', system-ui, sans-serif;
+    color: var(--navy);
+    background:
+      radial-gradient(circle at 10% 12%, rgba(200,16,46,0.10), transparent 30%),
+      radial-gradient(circle at 90% 85%, rgba(36,85,164,0.14), transparent 32%),
+      linear-gradient(135deg, #eef3fb 0%, #fdf1f3 100%);
+    min-height: 100vh;
+    padding: 1.2rem 1rem 4rem;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+
+  header { margin-bottom: 1.1rem; }
+  .header-top {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 0.8rem;
+  }
+  h1 { font-size: 1.55rem; font-weight: 700; }
+  h1 .accent { color: var(--red); }
+  .motto {
+    font-family: 'Gochi Hand', cursive; font-size: 1.1rem; color: var(--blue);
+    transform: rotate(-1.5deg); display: inline-block; margin-top: 0.15rem;
+  }
+  .mock-tag {
+    font-family: 'Gochi Hand', cursive; font-size: 1rem; color: var(--red);
+    transform: rotate(-2deg); display: inline-block;
+  }
+
+  .tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .tab {
+    font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.92rem;
+    padding: 0.55rem 1rem; border: 3px solid var(--navy); border-radius: 999px;
+    background: var(--paper); color: var(--navy); cursor: pointer;
+    box-shadow: 3px 3px 0 rgba(22,41,77,0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .tab:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 rgba(22,41,77,0.4); }
+  .tab.active { background: var(--blue); color: #fff; }
+  .tab .pill {
+    display: inline-block; min-width: 22px; text-align: center;
+    background: var(--red); color: #fff; border-radius: 999px;
+    font-size: 0.75rem; padding: 0.05rem 0.4rem; margin-left: 0.3rem;
+  }
+
+  .panel {
+    background: var(--paper); border: 3px solid var(--navy); border-radius: 20px;
+    box-shadow: 7px 8px 0 rgba(22,41,77,0.65); padding: 1.3rem;
+    display: none;
+    border-top: 8px solid var(--red);
+  }
+  .panel.active { display: block; animation: rise 0.3s ease; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .panel h2 { font-size: 1.15rem; margin-bottom: 0.25rem; }
+  .panel .sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 1rem; }
+
+  /* ---------- GRADEBOOK GRID ---------- */
+  .grid-scroll { overflow-x: auto; border: 2px solid var(--gold-line); border-radius: 12px; }
+  table { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 0.88rem; }
+  th, td { padding: 0.45rem 0.5rem; text-align: center; border-bottom: 1px solid var(--gold-line); }
+  thead th {
+    background: var(--blue-soft); font-weight: 600; font-size: 0.78rem;
+    position: sticky; top: 0; line-height: 1.2; color: var(--navy);
+  }
+  thead th .topic { display: block; font-weight: 500; color: var(--muted); font-size: 0.68rem; }
+  tbody th {
+    text-align: left; font-weight: 600; white-space: nowrap;
+    background: var(--cream); font-size: 0.85rem; padding-left: 0.7rem;
+  }
+  .cell {
+    cursor: pointer; border-radius: 8px; min-width: 62px;
+    user-select: none; transition: background 0.1s; font-weight: 600;
+  }
+  .cell:hover { outline: 2px dashed var(--blue); outline-offset: -2px; }
+  .cell.done { color: var(--navy); }
+  .cell.missing { background: var(--red-soft); color: var(--red); }
+  .cell.absent { background: #fff3d1; color: #9a7000; }
+  .cell.makeup { background: var(--blue-soft); color: var(--blue); }
+  .cell .st { display: block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .legend { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-top: 0.8rem; font-size: 0.78rem; color: var(--muted); }
+  .legend .key { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 4px; vertical-align: -1px; }
+  .hint { font-family: 'Gochi Hand', cursive; color: var(--blue); font-size: 1.05rem; margin-top: 0.7rem; }
+
+  /* ---------- OWED LIST ---------- */
+  .owed-group { margin-bottom: 1.1rem; }
+  .owed-group h3 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .owed-item {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.6rem; padding: 0.6rem 0.8rem; border: 2px solid var(--gold-line);
+    border-radius: 12px; margin-bottom: 0.45rem; background: var(--cream);
+    font-size: 0.9rem;
+  }
+  .owed-item .who { font-weight: 600; }
+  .owed-item .what { color: var(--muted); font-size: 0.82rem; }
+  .tag {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 0.2rem 0.55rem; border-radius: 999px;
+  }
+  .tag.missing { background: var(--red-soft); color: var(--red); }
+  .tag.absent { background: #fff3d1; color: #9a7000; }
+  .tag.makeup { background: var(--blue-soft); color: var(--blue); }
+  .all-clear { text-align: center; padding: 1.5rem; color: var(--muted); font-family: 'Gochi Hand', cursive; font-size: 1.3rem; }
+
+  /* ---------- RETEACH ---------- */
+  .topic-row { margin-bottom: 1rem; }
+  .topic-head { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .topic-head .avg { font-weight: 700; }
+  .bar-track { height: 20px; background: var(--blue-soft); border: 2px solid var(--navy); border-radius: 999px; overflow: hidden; }
+  .bar { height: 100%; border-radius: 999px; transition: width 0.6s cubic-bezier(.5,1.4,.4,1); }
+  .bar.good { background: var(--blue); }
+  .bar.warn { background: #e8a13d; }
+  .bar.bad  { background: var(--red); }
+  .flag { font-family: 'Gochi Hand', cursive; color: var(--red); font-size: 1rem; margin-top: 0.15rem; }
+
+  /* ---------- EXPORT ---------- */
+  .export-box { text-align: center; padding: 1rem 0.5rem; }
+  .big-btn {
+    font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1rem;
+    color: #fff; background: var(--red); border: 3px solid var(--navy);
+    border-radius: 14px; padding: 0.8rem 1.6rem; cursor: pointer;
+    box-shadow: 5px 5px 0 rgba(22,41,77,0.75); transition: transform 0.12s;
+  }
+  .big-btn:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 rgba(22,41,77,0.75); }
+  .export-note { font-size: 0.85rem; color: var(--muted); margin-top: 0.9rem; line-height: 1.5; max-width: 520px; margin-left: auto; margin-right: auto; }
+
+  /* ---------- VOICE ---------- */
+  .voice-row { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+  #voiceAsg {
+    font-family: 'Fredoka', sans-serif; font-size: 0.92rem; font-weight: 600;
+    padding: 0.45rem 0.7rem; border: 2px solid var(--navy); border-radius: 10px;
+    background: #fff; color: var(--navy);
+  }
+  .mic-btn {
+    font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.95rem;
+    color: #fff; background: var(--red); border: 3px solid var(--navy);
+    border-radius: 999px; padding: 0.6rem 1.3rem; cursor: pointer;
+    box-shadow: 4px 4px 0 rgba(22,41,77,0.6); transition: transform 0.1s;
+  }
+  .mic-btn:hover { transform: translate(-1px,-1px); }
+  .mic-btn.listening { background: var(--blue); animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{box-shadow:4px 4px 0 rgba(22,41,77,0.6),0 0 0 0 rgba(36,85,164,0.4);} 50%{box-shadow:4px 4px 0 rgba(22,41,77,0.6),0 0 0 12px rgba(36,85,164,0);} }
+  .mic-status { font-size: 0.85rem; color: var(--muted); font-family: 'Gochi Hand', cursive; font-size: 1.05rem; }
+  #voiceText {
+    width: 100%; font-family: 'Fredoka', sans-serif; font-size: 1rem;
+    padding: 0.7rem 0.85rem; border: 2px solid var(--navy); border-radius: 12px;
+    resize: vertical; margin-bottom: 0.7rem; color: var(--navy);
+  }
+  #voiceText::placeholder { color: #a4aec6; }
+  .review-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+    padding: 0.55rem 0.8rem; border: 2px solid var(--gold-line); border-radius: 12px;
+    margin-bottom: 0.4rem; background: var(--cream); font-size: 0.92rem;
+  }
+  .review-item.bad { border-color: var(--red); background: var(--red-soft); }
+  .review-item .parsed { font-weight: 600; }
+  .review-item .heard { color: var(--muted); font-size: 0.78rem; }
+  .review-item .drop {
+    background: none; border: none; color: var(--red); font-weight: 700;
+    cursor: pointer; font-size: 1rem; font-family: 'Fredoka', sans-serif;
+  }
+  .apply-row { margin-top: 0.8rem; text-align: right; }
+
+  /* editor modal */
+  .editor {
+    position: fixed; inset: 0; background: rgba(22,41,77,0.5);
+    display: none; align-items: center; justify-content: center; z-index: 10;
+  }
+  .editor.open { display: flex; }
+  .editor-card {
+    background: #fff; border: 4px solid var(--navy); border-radius: 20px;
+    box-shadow: 8px 9px 0 rgba(22,41,77,0.75); padding: 1.4rem 1.5rem;
+    width: min(92vw, 360px); animation: rise 0.2s ease;
+    border-top: 10px solid var(--red);
+  }
+  .editor-card h3 { font-size: 1.05rem; margin-bottom: 0.15rem; }
+  .editor-card .ctx { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.9rem; }
+  .status-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.9rem; }
+  .status-btn {
+    font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.85rem;
+    padding: 0.55rem 0.4rem; border: 2px solid var(--navy); border-radius: 10px;
+    cursor: pointer; background: var(--cream); color: var(--navy);
+  }
+  .status-btn.sel { outline: 3px solid var(--red); }
+  .score-line { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; }
+  .score-line label { font-size: 0.88rem; font-weight: 600; }
+  .score-line input {
+    font-family: 'Fredoka', sans-serif; font-size: 1.05rem; font-weight: 600;
+    width: 90px; padding: 0.45rem 0.6rem; border: 2px solid var(--navy); border-radius: 10px;
+  }
+  .editor-actions { display: flex; justify-content: flex-end; gap: 0.6rem; }
+  .mini-btn {
+    font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.85rem;
+    padding: 0.5rem 1rem; border: 2px solid var(--navy); border-radius: 10px; cursor: pointer;
+  }
+  .mini-btn.save { background: var(--blue); color: #fff; }
+  .mini-btn.cancel { background: #fff; color: var(--navy); }
+
+  @media (max-width: 560px) {
+    h1 { font-size: 1.25rem; }
+    .panel { padding: 1rem 0.8rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="header-top">
+      <h1>🐎 Mrs. H's <span class="accent">Mustang Tracker</span></h1>
+      <span class="mock-tag">mockup — click around, nothing saves yet!</span>
+    </div>
+    <span class="motto">"It's a great day to be a Mustang!"</span>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-panel="gradebook">✏️ Gradebook</button>
+    <button class="tab" data-panel="voice">🎤 Speak Grades</button>
+    <button class="tab" data-panel="owed">📋 Who Owes What <span class="pill" id="owedCount">0</span></button>
+    <button class="tab" data-panel="reteach">🔄 Re-teach Radar</button>
+    <button class="tab" data-panel="export">📤 Send to FACTS</button>
+  </div>
+
+  <section class="panel active" id="gradebook">
+    <h2>2nd Period — Pre-Algebra</h2>
+    <div class="sub">Tap any cell to set a score or mark missing / absent / makeup. Topic tags on each assignment feed the Re-teach Radar automatically.</div>
+    <div class="grid-scroll"><table id="gridTable"></table></div>
+    <div class="legend">
+      <span><span class="key" style="background:#fde8ec"></span>Missing</span>
+      <span><span class="key" style="background:#fff3d1"></span>Absent</span>
+      <span><span class="key" style="background:#e7f0fc"></span>Makeup pending</span>
+      <span><span class="key" style="background:#fff;border:1px solid var(--gold-line)"></span>Graded</span>
+    </div>
+    <div class="hint">↑ the whole app in one glance — everything else is generated from this grid</div>
+  </section>
+
+  <section class="panel" id="voice">
+    <h2>Speak Grades</h2>
+    <div class="sub">Pick the assignment, then talk: <em>"Marcus 78, Kayla absent, Josh missing, Emma 92."</em> Review what it heard, then apply. On iPad you can also tap the text box and use the keyboard's 🎙 dictation button — that always works.</div>
+
+    <div class="voice-row">
+      <label for="voiceAsg" style="font-weight:600;font-size:0.9rem;">Assignment:</label>
+      <select id="voiceAsg"></select>
+    </div>
+
+    <div class="voice-row">
+      <button class="mic-btn" id="micBtn">🎤 Start listening</button>
+      <span class="mic-status" id="micStatus"></span>
+    </div>
+
+    <textarea id="voiceText" rows="3" placeholder="…or tap here and use the iPad keyboard's 🎙 dictation — e.g. Marcus 78, Kayla absent, Josh missing, Emma 92"></textarea>
+
+    <div class="voice-row" style="justify-content:flex-end;">
+      <button class="mini-btn cancel" onclick="clearVoice()">Clear</button>
+      <button class="mini-btn save" onclick="parseVoice()">Review what I said →</button>
+    </div>
+
+    <div id="reviewArea"></div>
+  </section>
+
+  <section class="panel" id="owed">
+    <h2>Who Owes What</h2>
+    <div class="sub">Built automatically from the gradebook — no separate list to maintain. This is the tab you'd open when a kid says "wait, what am I missing?"</div>
+    <div id="owedList"></div>
+  </section>
+
+  <section class="panel" id="reteach">
+    <h2>Re-teach Radar</h2>
+    <div class="sub">Class average by topic, rolled up from every graded assignment tagged with that topic. Red flags = strong candidates to re-teach before moving on.</div>
+    <div id="topicBars"></div>
+  </section>
+
+  <section class="panel" id="export">
+    <h2>Send to FACTS / RenWeb</h2>
+    <div class="export-box">
+      <button class="big-btn" onclick="mockExport()">⬇️ Download grades as CSV</button>
+      <p class="export-note">
+        <strong>Phase 1:</strong> download a CSV shaped for quick entry or import into FACTS — enter once here, transfer in one motion.<br><br>
+        <strong>Phase 2 (if the school says yes):</strong> FACTS has an API, but the key has to be turned on by the school's FACTS administrator. If they'll grant one, grades could sync automatically — no double entry at all. That's a conversation with the front office, not a technical blocker.
+      </p>
+    </div>
+  </section>
+</div>
+
+<div class="editor" id="editor">
+  <div class="editor-card">
+    <h3 id="edTitle">Student — Assignment</h3>
+    <div class="ctx" id="edCtx">Topic</div>
+    <div class="status-row">
+      <button class="status-btn" data-status="done">✅ Graded</button>
+      <button class="status-btn" data-status="missing">❌ Missing</button>
+      <button class="status-btn" data-status="absent">🏠 Absent</button>
+      <button class="status-btn" data-status="makeup">🔄 Makeup</button>
+    </div>
+    <div class="score-line">
+      <label for="scoreInput">Score:</label>
+      <input type="number" id="scoreInput" min="0" max="100" placeholder="—">
+      <span style="font-size:0.85rem;color:var(--muted)">/ 100</span>
+    </div>
+    <div class="editor-actions">
+      <button class="mini-btn cancel" onclick="closeEditor()">Cancel</button>
+      <button class="mini-btn save" onclick="saveEditor()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const students = ["Avery B.","Marcus D.","Kayla F.","Josh G.","Emma H.","Liam J.","Sofia M.","Tyler P.","Grace R.","Diego S."];
+
+const assignments = [
+  { name: "HW 4.1", topic: "Two-step equations" },
+  { name: "Quiz 4.1", topic: "Two-step equations" },
+  { name: "HW 4.2", topic: "Distributive property" },
+  { name: "Quiz 4.2", topic: "Distributive property" },
+  { name: "HW 4.3", topic: "Proportions" },
+  { name: "Quiz 4.3", topic: "Proportions" },
+  { name: "HW 4.4", topic: "Percent problems" },
+  { name: "Test Ch. 4", topic: "Chapter 4 mixed" },
+];
+
+const cells = {};
+function key(s,a){ return s+"|"+a; }
+
+(function seed(){
+  const rnd = mulberry(42);
+  students.forEach((s,si)=>{
+    assignments.forEach((a,ai)=>{
+      let status="done", score=null;
+      const r = rnd();
+      if (r<0.06) status="missing";
+      else if (r<0.11) status="absent";
+      else if (r<0.15) status="makeup";
+      if (status==="done"){
+        let base = 72 + (si%4)*6;
+        if (a.topic==="Distributive property") base -= 14;
+        if (a.topic==="Percent problems") base -= 7;
+        score = Math.max(38, Math.min(100, Math.round(base + (rnd()*22-11))));
+      }
+      cells[key(s,a.name)] = { status, score };
+    });
+  });
+  cells[key("Josh G.","Quiz 4.2")] = { status:"missing", score:null };
+  cells[key("Josh G.","HW 4.3")]  = { status:"missing", score:null };
+  cells[key("Kayla F.","Quiz 4.3")]= { status:"absent",  score:null };
+  cells[key("Kayla F.","HW 4.4")] = { status:"makeup",  score:null };
+})();
+
+function mulberry(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+
+const table = document.getElementById('gridTable');
+function renderGrid(){
+  let html = "<thead><tr><th style='text-align:left'>Student</th>";
+  assignments.forEach(a=>{ html += `<th>${a.name}<span class="topic">${a.topic}</span></th>`; });
+  html += "</tr></thead><tbody>";
+  students.forEach(s=>{
+    html += `<tr><th>${s}</th>`;
+    assignments.forEach(a=>{
+      const c = cells[key(s,a.name)];
+      let inner="", cls=c.status;
+      if (c.status==="done") inner = (c.score==null?"—":c.score);
+      else if (c.status==="missing") inner = `—<span class="st">missing</span>`;
+      else if (c.status==="absent") inner = `—<span class="st">absent</span>`;
+      else if (c.status==="makeup") inner = `—<span class="st">makeup</span>`;
+      html += `<td class="cell ${cls}" data-s="${s}" data-a="${a.name}">${inner}</td>`;
+    });
+    html += "</tr>";
+  });
+  html += "</tbody>";
+  table.innerHTML = html;
+  table.querySelectorAll('.cell').forEach(td=>{
+    td.onclick = ()=> openEditor(td.dataset.s, td.dataset.a);
+  });
+  renderOwed();
+  renderTopics();
+}
+
+function renderOwed(){
+  const groups = { missing:[], absent:[], makeup:[] };
+  students.forEach(s=>{
+    assignments.forEach(a=>{
+      const c = cells[key(s,a.name)];
+      if (c.status!=="done") groups[c.status].push({s, a:a.name, topic:a.topic});
+    });
+  });
+  const total = groups.missing.length + groups.absent.length + groups.makeup.length;
+  document.getElementById('owedCount').textContent = total;
+
+  const titles = { missing:"❌ Missing work", absent:"🏠 Absent — needs the assignment", makeup:"🔄 Makeup pending" };
+  let html = "";
+  ["missing","absent","makeup"].forEach(g=>{
+    if (!groups[g].length) return;
+    html += `<div class="owed-group"><h3>${titles[g]} (${groups[g].length})</h3>`;
+    groups[g].forEach(item=>{
+      html += `<div class="owed-item">
+        <div><span class="who">${item.s}</span> <span class="what">— ${item.a} · ${item.topic}</span></div>
+        <span class="tag ${g}">${g}</span></div>`;
+    });
+    html += "</div>";
+  });
+  if (!html) html = `<div class="all-clear">nothing owed — the herd is all caught up! 🐎🎉</div>`;
+  document.getElementById('owedList').innerHTML = html;
+}
+
+function renderTopics(){
+  const topics = {};
+  assignments.forEach(a=>{
+    students.forEach(s=>{
+      const c = cells[key(s,a.name)];
+      if (c.status==="done" && c.score!=null){
+        (topics[a.topic] = topics[a.topic]||[]).push(c.score);
+      }
+    });
+  });
+  let html = "";
+  Object.entries(topics).sort((x,y)=>avg(x[1])-avg(y[1])).forEach(([topic,scores])=>{
+    const a = Math.round(avg(scores));
+    const cls = a>=80 ? "good" : a>=70 ? "warn" : "bad";
+    html += `<div class="topic-row">
+      <div class="topic-head"><span>${topic}</span><span class="avg">${a}%</span></div>
+      <div class="bar-track"><div class="bar ${cls}" style="width:${a}%"></div></div>
+      ${cls==="bad" ? `<div class="flag">⚠ strong re-teach candidate — class avg under 70</div>`:""}
+    </div>`;
+  });
+  document.getElementById('topicBars').innerHTML = html;
+}
+function avg(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.panel).classList.add('active');
+  };
+});
+
+let editing = null;
+const editor = document.getElementById('editor');
+function openEditor(s,a){
+  editing = {s,a};
+  const asg = assignments.find(x=>x.name===a);
+  const c = cells[key(s,a)];
+  document.getElementById('edTitle').textContent = `${s} — ${a}`;
+  document.getElementById('edCtx').textContent = `Topic: ${asg.topic}`;
+  document.getElementById('scoreInput').value = c.score==null?"":c.score;
+  document.querySelectorAll('.status-btn').forEach(b=>{
+    b.classList.toggle('sel', b.dataset.status===c.status);
+  });
+  editor.classList.add('open');
+}
+document.querySelectorAll('.status-btn').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('.status-btn').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');
+  };
+});
+function closeEditor(){ editor.classList.remove('open'); editing=null; }
+function saveEditor(){
+  if (!editing) return;
+  const status = document.querySelector('.status-btn.sel')?.dataset.status || "done";
+  const raw = document.getElementById('scoreInput').value;
+  const score = raw==="" ? null : Math.max(0, Math.min(100, Number(raw)));
+  cells[key(editing.s, editing.a)] = { status, score: status==="done" ? score : null };
+  closeEditor();
+  renderGrid();
+}
+editor.addEventListener('click', e=>{ if(e.target===editor) closeEditor(); });
+
+function mockExport(){
+  let csv = "Student," + assignments.map(a=>a.name).join(",") + "\n";
+  students.forEach(s=>{
+    csv += s + "," + assignments.map(a=>{
+      const c = cells[key(s,a.name)];
+      return c.status==="done" ? (c.score??"") : c.status.toUpperCase();
+    }).join(",") + "\n";
+  });
+  const blob = new Blob([csv], {type:"text/csv"});
+  const url = URL.createObjectURL(blob);
+  const el = document.createElement('a');
+  el.href = url; el.download = "mustang-tracker-grades.csv";
+  el.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ---------- VOICE ENTRY ---------- */
+const voiceAsg = document.getElementById('voiceAsg');
+assignments.forEach(a=>{
+  const o = document.createElement('option');
+  o.value = a.name; o.textContent = `${a.name} — ${a.topic}`;
+  voiceAsg.appendChild(o);
+});
+
+const micBtn = document.getElementById('micBtn');
+const micStatus = document.getElementById('micStatus');
+const voiceText = document.getElementById('voiceText');
+let recog = null, listening = false;
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SR) {
+  recog = new SR();
+  recog.continuous = true;
+  recog.interimResults = true;
+  recog.lang = 'en-US';
+  recog.onresult = (e)=>{
+    let final = "";
+    for (let i=0;i<e.results.length;i++){
+      if (e.results[i].isFinal) final += e.results[i][0].transcript + " ";
+    }
+    if (final) voiceText.value = (voiceText.value + " " + final).trim();
+    micStatus.textContent = "listening… talk naturally";
+  };
+  recog.onend = ()=>{ if (listening) { try{recog.start();}catch(_){}} else { micStatus.textContent = ""; } };
+  recog.onerror = ()=>{ micStatus.textContent = "mic hiccup — the ⌨️ 🎙 dictation below always works"; };
+} else {
+  micBtn.style.display = "none";
+  micStatus.textContent = "no browser mic here — use the iPad keyboard's 🎙 dictation in the box below";
+}
+
+micBtn.onclick = ()=>{
+  if (!recog) return;
+  if (!listening) {
+    listening = true;
+    try { recog.start(); } catch(_){}
+    micBtn.textContent = "⏹ Stop";
+    micBtn.classList.add('listening');
+    micStatus.textContent = "listening… talk naturally";
+  } else {
+    listening = false;
+    recog.stop();
+    micBtn.textContent = "🎤 Start listening";
+    micBtn.classList.remove('listening');
+    micStatus.textContent = "";
+  }
+};
+
+/* number words for scores spoken as words */
+const wordNums = { "one hundred":100,"hundred":100,"ninety":90,"eighty":80,"seventy":70,"sixty":60,"fifty":50,"forty":40,"thirty":30,"twenty":20,"ten":10,"zero":0 };
+
+function matchStudent(token){
+  const t = token.toLowerCase().trim();
+  if (!t) return null;
+  let best = null;
+  students.forEach(s=>{
+    const first = s.split(" ")[0].toLowerCase();
+    if (t === first || t.startsWith(first) || first.startsWith(t)) best = s;
+  });
+  return best;
+}
+
+function parseVoice(){
+  const raw = voiceText.value.trim();
+  const area = document.getElementById('reviewArea');
+  if (!raw){ area.innerHTML = `<div class="mic-status">nothing to review yet — speak or dictate first</div>`; return; }
+
+  const chunks = raw.split(/,|\band\b|\.|;/i).map(c=>c.trim()).filter(Boolean);
+  const parsed = [];
+
+  chunks.forEach(chunk=>{
+    const lower = chunk.toLowerCase();
+    let status = null;
+    if (/\babsent\b/.test(lower)) status = "absent";
+    else if (/\bmissing\b|\bdidn'?t turn\b|\bno work\b/.test(lower)) status = "missing";
+    else if (/\bmake ?up\b|\bmakeup\b/.test(lower)) status = "makeup";
+
+    let score = null;
+    const digits = lower.match(/\b(\d{1,3})\b/);
+    if (digits) score = Math.min(100, Number(digits[1]));
+    else {
+      for (const [w,v] of Object.entries(wordNums)){
+        const m = lower.match(new RegExp(`\\b${w}\\b(?:[ -](one|two|three|four|five|six|seven|eight|nine))?`));
+        if (m){
+          const ones = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9}[m[1]] || 0;
+          score = Math.min(100, v + ones); break;
+        }
+      }
+    }
+
+    const nameToken = chunk.replace(/\d+/g,"").replace(/\b(absent|missing|makeup|make up|got|scored|a|an|is|was)\b/gi,"").trim();
+    const student = matchStudent(nameToken);
+
+    if (student && (score!=null || status)){
+      parsed.push({ student, score: status? null : score, status: status || "done", heard: chunk, ok: true });
+    } else if (chunk.length > 1){
+      parsed.push({ student: null, score, status, heard: chunk, ok: false });
+    }
+  });
+
+  if (!parsed.length){ area.innerHTML = `<div class="mic-status">couldn't find any "name + score/status" pairs in that — try "Marcus 78, Kayla absent"</div>`; return; }
+
+  window._pendingParse = parsed;
+  let html = `<h3 style="font-size:0.95rem;margin:0.6rem 0 0.5rem;">Heard for <u>${voiceAsg.value}</u> — tap ✕ to drop a line, then apply:</h3>`;
+  parsed.forEach((p,i)=>{
+    if (p.ok){
+      const what = p.status==="done" ? `score <b>${p.score}</b>` : `<b>${p.status}</b>`;
+      html += `<div class="review-item" data-i="${i}">
+        <div><span class="parsed">${p.student}</span> → ${what}<div class="heard">heard: "${p.heard}"</div></div>
+        <button class="drop" onclick="dropParse(${i})">✕</button></div>`;
+    } else {
+      html += `<div class="review-item bad" data-i="${i}">
+        <div><span class="parsed">Didn't catch a student</span><div class="heard">heard: "${p.heard}"</div></div>
+        <button class="drop" onclick="dropParse(${i})">✕</button></div>`;
+    }
+  });
+  html += `<div class="apply-row"><button class="big-btn" onclick="applyParse()">✅ Apply to gradebook</button></div>`;
+  area.innerHTML = html;
+}
+
+function dropParse(i){
+  window._pendingParse[i].dropped = true;
+  document.querySelector(`.review-item[data-i="${i}"]`)?.remove();
+}
+
+function applyParse(){
+  const asg = voiceAsg.value;
+  let applied = 0;
+  (window._pendingParse||[]).forEach(p=>{
+    if (p.dropped || !p.ok) return;
+    cells[key(p.student, asg)] = { status: p.status, score: p.status==="done" ? p.score : null };
+    applied++;
+  });
+  renderGrid();
+  document.getElementById('reviewArea').innerHTML =
+    `<div class="mic-status" style="font-size:1.2rem;color:var(--blue);">✅ applied ${applied} grade${applied===1?"":"s"} to ${asg} — check the Gradebook tab!</div>`;
+  voiceText.value = "";
+  window._pendingParse = null;
+}
+
+function clearVoice(){
+  voiceText.value = "";
+  document.getElementById('reviewArea').innerHTML = "";
+  window._pendingParse = null;
+}
+
+renderGrid();
+</script>
+</body>
+</html>
