@@ -14,5 +14,9 @@
 # Supabase CLI local link state (machine-specific, includes pooler URL)
 supabase/.temp/
 
+# Throwaway session used for local end-to-end testing. Never commit — it is a
+# live bearer token.
+_session.json
+
 # Node (only if a tool step is ever added)
 node_modules/

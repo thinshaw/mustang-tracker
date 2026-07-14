@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mrs. H's Mustang Tracker — Mockup</title>
+<title>Mrs. H's Mustang Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Gochi+Hand&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -41,10 +41,9 @@
     font-family: 'Gochi Hand', cursive; font-size: 1.1rem; color: var(--blue);
     transform: rotate(-1.5deg); display: inline-block; margin-top: 0.15rem;
   }
-  .mock-tag {
-    font-family: 'Gochi Hand', cursive; font-size: 1rem; color: var(--red);
-    transform: rotate(-2deg); display: inline-block;
-  }
+
+  .who-bar { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; font-size: 0.82rem; color: var(--muted); }
+  .who-bar .email { font-weight: 600; color: var(--navy); }
 
   .tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
   .tab {
@@ -96,6 +95,8 @@
   .cell.missing { background: var(--red-soft); color: var(--red); }
   .cell.absent { background: #fff3d1; color: #9a7000; }
   .cell.makeup { background: var(--blue-soft); color: var(--blue); }
+  /* not entered yet — distinct from any status */
+  .cell.empty { color: #c3cbdd; font-weight: 400; }
   .cell .st { display: block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
   .legend { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-top: 0.8rem; font-size: 0.78rem; color: var(--muted); }
   .legend .key { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 4px; vertical-align: -1px; }
@@ -115,6 +116,7 @@
   .tag {
     font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.05em; padding: 0.2rem 0.55rem; border-radius: 999px;
+    background: var(--blue-soft); color: var(--blue);
   }
   .tag.missing { background: var(--red-soft); color: var(--red); }
   .tag.absent { background: #fff3d1; color: #9a7000; }
@@ -141,15 +143,17 @@
     box-shadow: 5px 5px 0 rgba(22,41,77,0.75); transition: transform 0.12s;
   }
   .big-btn:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 rgba(22,41,77,0.75); }
+  .big-btn:disabled { opacity: 0.55; cursor: default; transform: none; }
   .export-note { font-size: 0.85rem; color: var(--muted); margin-top: 0.9rem; line-height: 1.5; max-width: 520px; margin-left: auto; margin-right: auto; }
 
   /* ---------- VOICE ---------- */
   .voice-row { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
-  #voiceAsg {
+  select.pick, input.txt {
     font-family: 'Fredoka', sans-serif; font-size: 0.92rem; font-weight: 600;
     padding: 0.45rem 0.7rem; border: 2px solid var(--navy); border-radius: 10px;
     background: #fff; color: var(--navy);
   }
+  input.txt { font-weight: 500; }
   .mic-btn {
     font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.95rem;
     color: #fff; background: var(--red); border: 3px solid var(--navy);
@@ -159,13 +163,13 @@
   .mic-btn:hover { transform: translate(-1px,-1px); }
   .mic-btn.listening { background: var(--blue); animation: pulse 1.2s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{box-shadow:4px 4px 0 rgba(22,41,77,0.6),0 0 0 0 rgba(36,85,164,0.4);} 50%{box-shadow:4px 4px 0 rgba(22,41,77,0.6),0 0 0 12px rgba(36,85,164,0);} }
-  .mic-status { font-size: 0.85rem; color: var(--muted); font-family: 'Gochi Hand', cursive; font-size: 1.05rem; }
-  #voiceText {
+  .mic-status { color: var(--muted); font-family: 'Gochi Hand', cursive; font-size: 1.05rem; }
+  textarea.say {
     width: 100%; font-family: 'Fredoka', sans-serif; font-size: 1rem;
     padding: 0.7rem 0.85rem; border: 2px solid var(--navy); border-radius: 12px;
     resize: vertical; margin-bottom: 0.7rem; color: var(--navy);
   }
-  #voiceText::placeholder { color: #a4aec6; }
+  textarea.say::placeholder { color: #a4aec6; }
   .review-item {
     display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
     padding: 0.55rem 0.8rem; border: 2px solid var(--gold-line); border-radius: 12px;
@@ -179,6 +183,38 @@
     cursor: pointer; font-size: 1rem; font-family: 'Fredoka', sans-serif;
   }
   .apply-row { margin-top: 0.8rem; text-align: right; }
+
+  /* ---------- ROSTER / SETUP ---------- */
+  .setup-block { border: 2px solid var(--gold-line); border-radius: 14px; padding: 1rem; margin-bottom: 1.1rem; background: var(--cream); }
+  .setup-block h3 { font-size: 0.98rem; margin-bottom: 0.2rem; }
+  .setup-block .note { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.7rem; line-height: 1.45; }
+  .chip-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.7rem; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: #fff; border: 2px solid var(--navy); border-radius: 999px;
+    padding: 0.3rem 0.65rem; font-size: 0.85rem; font-weight: 600;
+  }
+  .chip .x { color: var(--red); cursor: pointer; font-weight: 700; }
+  .chip .sub2 { color: var(--muted); font-weight: 500; font-size: 0.75rem; }
+  .row-form { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+  .empty-note { color: var(--muted); font-family: 'Gochi Hand', cursive; font-size: 1.1rem; padding: 0.4rem 0; }
+
+  /* ---------- AUTH / SETUP SCREENS ---------- */
+  .gate { max-width: 470px; margin: 3rem auto; }
+  .gate .panel { display: block; }
+  .gate p { font-size: 0.9rem; color: var(--muted); line-height: 1.55; margin-bottom: 1rem; }
+  .gate input.txt { width: 100%; margin-bottom: 0.8rem; font-size: 1rem; padding: 0.7rem 0.85rem; }
+  .msg { font-family: 'Gochi Hand', cursive; font-size: 1.1rem; margin-top: 0.9rem; }
+  .msg.ok { color: var(--blue); }
+  .msg.err { color: var(--red); }
+  .toast {
+    position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
+    background: var(--navy); color: #fff; padding: 0.7rem 1.2rem;
+    border-radius: 999px; font-size: 0.9rem; font-weight: 600; z-index: 40;
+    box-shadow: 4px 4px 0 rgba(22,41,77,0.4); display: none;
+  }
+  .toast.show { display: block; animation: rise 0.25s ease; }
+  .toast.err { background: var(--red); }
 
   /* editor modal */
   .editor {
@@ -207,6 +243,7 @@
     font-family: 'Fredoka', sans-serif; font-size: 1.05rem; font-weight: 600;
     width: 90px; padding: 0.45rem 0.6rem; border: 2px solid var(--navy); border-radius: 10px;
   }
+  .score-line.off { opacity: 0.4; }
   .editor-actions { display: flex; justify-content: flex-end; gap: 0.6rem; }
   .mini-btn {
     font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.85rem;
@@ -214,6 +251,7 @@
   }
   .mini-btn.save { background: var(--blue); color: #fff; }
   .mini-btn.cancel { background: #fff; color: var(--navy); }
+  .mini-btn.danger { background: #fff; color: var(--red); border-color: var(--red); }
 
   @media (max-width: 560px) {
     h1 { font-size: 1.25rem; }
@@ -222,13 +260,62 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<!-- ============ SIGN IN ============ -->
+<div class="gate" id="authScreen" style="display:none">
+  <div class="panel">
+    <h1 style="margin-bottom:0.3rem">🐎 Mrs. H's <span class="accent">Mustang Tracker</span></h1>
+    <span class="motto">"It's a great day to be a Mustang!"</span>
+    <p style="margin-top:1rem">
+      Sign in with your email. We'll send a magic link — no password to remember,
+      ever. Your grades are saved to your account, so a new iPad or a cleared
+      browser can't lose them.
+    </p>
+    <input class="txt" type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
+    <button class="big-btn" id="authBtn">✉️ Email me a magic link</button>
+    <div class="msg" id="authMsg"></div>
+  </div>
+</div>
+
+<!-- ============ FIRST-RUN SETUP ============ -->
+<div class="gate" id="setupScreen" style="display:none">
+  <div class="panel">
+    <h2>Let's set up your first class 🐎</h2>
+    <div class="sub">You don't have any classes yet. Start one from scratch, or load the demo class to poke around first.</div>
+    <div class="row-form" style="margin-bottom:0.9rem">
+      <input class="txt" id="newClassName" placeholder="2nd Period — Pre-Algebra" style="flex:1;min-width:200px">
+      <button class="mini-btn save" id="createClassBtn">Create class</button>
+    </div>
+    <div class="setup-block" style="margin-bottom:0">
+      <h3>Just want to look around?</h3>
+      <div class="note">
+        Loads a full pretend class — 10 made-up students, 8 assignments, a term of
+        grades. Nothing real, and you can delete it whenever.
+      </div>
+      <button class="big-btn" id="demoBtn">🎒 Load the demo class</button>
+    </div>
+    <div class="msg" id="setupMsg"></div>
+    <div class="who-bar" style="margin-top:1rem">
+      <span class="email" id="setupEmail"></span>
+      <button class="mini-btn cancel" id="setupSignOut">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div class="wrap" id="app" style="display:none">
   <header>
     <div class="header-top">
-      <h1>🐎 Mrs. H's <span class="accent">Mustang Tracker</span></h1>
-      <span class="mock-tag">mockup — click around, nothing saves yet!</span>
+      <div>
+        <h1>🐎 Mrs. H's <span class="accent">Mustang Tracker</span></h1>
+        <span class="motto">"It's a great day to be a Mustang!"</span>
+      </div>
+      <div class="who-bar">
+        <select class="pick" id="classPicker" title="Class period"></select>
+        <span class="email" id="userEmail"></span>
+        <button class="mini-btn cancel" id="signOutBtn">Sign out</button>
+      </div>
     </div>
-    <span class="motto">"It's a great day to be a Mustang!"</span>
   </header>
 
   <div class="tabs">
@@ -236,19 +323,15 @@
     <button class="tab" data-panel="voice">🎤 Speak Grades</button>
     <button class="tab" data-panel="owed">📋 Who Owes What <span class="pill" id="owedCount">0</span></button>
     <button class="tab" data-panel="reteach">🔄 Re-teach Radar</button>
+    <button class="tab" data-panel="roster">🎒 Class Setup</button>
     <button class="tab" data-panel="export">📤 Send to FACTS</button>
   </div>
 
   <section class="panel active" id="gradebook">
-    <h2>2nd Period — Pre-Algebra</h2>
-    <div class="sub">Tap any cell to set a score or mark missing / absent / makeup. Topic tags on each assignment feed the Re-teach Radar automatically.</div>
+    <h2 id="gbTitle">Gradebook</h2>
+    <div class="sub">Tap any cell to set a score or mark missing / absent / makeup. Topic tags on each assignment feed the Re-teach Radar automatically. Every change saves to your account immediately.</div>
     <div class="grid-scroll"><table id="gridTable"></table></div>
-    <div class="legend">
-      <span><span class="key" style="background:#fde8ec"></span>Missing</span>
-      <span><span class="key" style="background:#fff3d1"></span>Absent</span>
-      <span><span class="key" style="background:#e7f0fc"></span>Makeup pending</span>
-      <span><span class="key" style="background:#fff;border:1px solid var(--gold-line)"></span>Graded</span>
-    </div>
+    <div class="legend" id="legend"></div>
     <div class="hint">↑ the whole app in one glance — everything else is generated from this grid</div>
   </section>
 
@@ -258,7 +341,7 @@
 
     <div class="voice-row">
       <label for="voiceAsg" style="font-weight:600;font-size:0.9rem;">Assignment:</label>
-      <select id="voiceAsg"></select>
+      <select class="pick" id="voiceAsg"></select>
     </div>
 
     <div class="voice-row">
@@ -266,11 +349,11 @@
       <span class="mic-status" id="micStatus"></span>
     </div>
 
-    <textarea id="voiceText" rows="3" placeholder="…or tap here and use the iPad keyboard's 🎙 dictation — e.g. Marcus 78, Kayla absent, Josh missing, Emma 92"></textarea>
+    <textarea class="say" id="voiceText" rows="3" placeholder="…or tap here and use the iPad keyboard's 🎙 dictation — e.g. Marcus 78, Kayla absent, Josh missing, Emma 92"></textarea>
 
     <div class="voice-row" style="justify-content:flex-end;">
-      <button class="mini-btn cancel" onclick="clearVoice()">Clear</button>
-      <button class="mini-btn save" onclick="parseVoice()">Review what I said →</button>
+      <button class="mini-btn cancel" id="voiceClear">Clear</button>
+      <button class="mini-btn save" id="voiceReview">Review what I said →</button>
     </div>
 
     <div id="reviewArea"></div>
@@ -288,10 +371,75 @@
     <div id="topicBars"></div>
   </section>
 
+  <!-- ---------- CLASS SETUP / ROSTER ---------- -->
+  <section class="panel" id="roster">
+    <h2>Class Setup</h2>
+    <div class="sub">Your roster and your assignments. Add students by typing, by talking, or by pasting a CSV straight out of FACTS.</div>
+
+    <div class="setup-block">
+      <h3>Students <span class="sub2" id="studentCount"></span></h3>
+      <div class="note">Tap the ✕ on a student to remove them. Removing a student deletes their grades too.</div>
+      <div class="chip-list" id="studentChips"></div>
+
+      <div class="row-form" style="margin-bottom:0.8rem">
+        <input class="txt" id="addStudentInput" placeholder="Marcus Davis, Kayla Fields, Josh…" style="flex:1;min-width:220px">
+        <button class="mini-btn save" id="addStudentBtn">+ Add</button>
+      </div>
+      <div class="note" style="margin-bottom:0.8rem">
+        Type one name or several separated by commas. Last name is optional — it's
+        only used to tell two kids with the same first name apart.
+      </div>
+
+      <div class="voice-row">
+        <button class="mic-btn" id="rosterMicBtn">🎤 Speak the roster</button>
+        <span class="mic-status" id="rosterMicStatus"></span>
+      </div>
+      <textarea class="say" id="rosterText" rows="2" placeholder="…or dictate: &quot;Avery Brooks, Marcus Davis, Kayla Fields&quot;"></textarea>
+      <div class="voice-row" style="justify-content:flex-end;">
+        <button class="mini-btn cancel" id="rosterClear">Clear</button>
+        <button class="mini-btn save" id="rosterReview">Review names →</button>
+      </div>
+      <div id="rosterReviewArea"></div>
+
+      <div style="margin-top:0.9rem">
+        <div class="note" style="margin-bottom:0.5rem">
+          <strong>Import a CSV.</strong> One student per line — <code>First,Last</code>
+          or just <code>First</code>. A header row is fine; it'll be skipped.
+        </div>
+        <div class="row-form">
+          <input type="file" id="csvFile" accept=".csv,text/csv" style="font-size:0.85rem">
+        </div>
+      </div>
+    </div>
+
+    <div class="setup-block">
+      <h3>Assignments <span class="sub2" id="asgCount"></span></h3>
+      <div class="note">Each assignment carries a topic. The topic is what the Re-teach Radar groups by, so keep the wording consistent.</div>
+      <div class="chip-list" id="asgChips"></div>
+      <div class="row-form">
+        <input class="txt" id="addAsgName" placeholder="Quiz 4.5" style="width:130px">
+        <input class="txt" id="addAsgTopic" placeholder="Topic — e.g. Proportions" list="topicList" style="flex:1;min-width:170px">
+        <datalist id="topicList"></datalist>
+        <input class="txt" id="addAsgPoints" type="number" value="100" min="1" style="width:80px" title="Points possible">
+        <button class="mini-btn save" id="addAsgBtn">+ Add</button>
+      </div>
+    </div>
+
+    <div class="setup-block">
+      <h3>Class periods</h3>
+      <div class="note">Add another period and switch between them from the picker up top.</div>
+      <div class="row-form">
+        <input class="txt" id="addClassName" placeholder="4th Period — Algebra I" style="flex:1;min-width:200px">
+        <button class="mini-btn save" id="addClassBtn">+ Add period</button>
+        <button class="mini-btn danger" id="deleteClassBtn">Delete this class</button>
+      </div>
+    </div>
+  </section>
+
   <section class="panel" id="export">
     <h2>Send to FACTS / RenWeb</h2>
     <div class="export-box">
-      <button class="big-btn" onclick="mockExport()">⬇️ Download grades as CSV</button>
+      <button class="big-btn" id="exportBtn">⬇️ Download grades as CSV</button>
       <p class="export-note">
         <strong>Phase 1:</strong> download a CSV shaped for quick entry or import into FACTS — enter once here, transfer in one motion.<br><br>
         <strong>Phase 2 (if the school says yes):</strong> FACTS has an API, but the key has to be turned on by the school's FACTS administrator. If they'll grant one, grades could sync automatically — no double entry at all. That's a conversation with the front office, not a technical blocker.
@@ -304,352 +452,911 @@
   <div class="editor-card">
     <h3 id="edTitle">Student — Assignment</h3>
     <div class="ctx" id="edCtx">Topic</div>
-    <div class="status-row">
-      <button class="status-btn" data-status="done">✅ Graded</button>
-      <button class="status-btn" data-status="missing">❌ Missing</button>
-      <button class="status-btn" data-status="absent">🏠 Absent</button>
-      <button class="status-btn" data-status="makeup">🔄 Makeup</button>
-    </div>
-    <div class="score-line">
+    <div class="status-row" id="statusRow"></div>
+    <div class="score-line" id="scoreLine">
       <label for="scoreInput">Score:</label>
       <input type="number" id="scoreInput" min="0" max="100" placeholder="—">
-      <span style="font-size:0.85rem;color:var(--muted)">/ 100</span>
+      <span style="font-size:0.85rem;color:var(--muted)" id="pointsHint">/ 100</span>
     </div>
     <div class="editor-actions">
-      <button class="mini-btn cancel" onclick="closeEditor()">Cancel</button>
-      <button class="mini-btn save" onclick="saveEditor()">Save</button>
+      <button class="mini-btn cancel" id="edCancel">Cancel</button>
+      <button class="mini-btn save" id="edSave">Save</button>
     </div>
   </div>
 </div>
 
-<script>
-const students = ["Avery B.","Marcus D.","Kayla F.","Josh G.","Emma H.","Liam J.","Sofia M.","Tyler P.","Grace R.","Diego S."];
+<div class="toast" id="toast"></div>
 
-const assignments = [
-  { name: "HW 4.1", topic: "Two-step equations" },
-  { name: "Quiz 4.1", topic: "Two-step equations" },
-  { name: "HW 4.2", topic: "Distributive property" },
-  { name: "Quiz 4.2", topic: "Distributive property" },
-  { name: "HW 4.3", topic: "Proportions" },
-  { name: "Quiz 4.3", topic: "Proportions" },
-  { name: "HW 4.4", topic: "Percent problems" },
-  { name: "Test Ch. 4", topic: "Chapter 4 mixed" },
-];
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+// The parsing/matching/CSV logic lives in lib.js and is covered by test/.
+// The app imports it rather than keeping its own copy, so what ships is exactly
+// what the tests exercise.
+import {
+  splitName, parseCsvNames, toCsv,
+  parseGrades, parseRosterNames,
+} from './lib.js';
 
-const cells = {};
-function key(s,a){ return s+"|"+a; }
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-(function seed(){
-  const rnd = mulberry(42);
-  students.forEach((s,si)=>{
-    assignments.forEach((a,ai)=>{
-      let status="done", score=null;
-      const r = rnd();
-      if (r<0.06) status="missing";
-      else if (r<0.11) status="absent";
-      else if (r<0.15) status="makeup";
-      if (status==="done"){
-        let base = 72 + (si%4)*6;
-        if (a.topic==="Distributive property") base -= 14;
-        if (a.topic==="Percent problems") base -= 7;
-        score = Math.max(38, Math.min(100, Math.round(base + (rnd()*22-11))));
-      }
-      cells[key(s,a.name)] = { status, score };
-    });
-  });
-  cells[key("Josh G.","Quiz 4.2")] = { status:"missing", score:null };
-  cells[key("Josh G.","HW 4.3")]  = { status:"missing", score:null };
-  cells[key("Kayla F.","Quiz 4.3")]= { status:"absent",  score:null };
-  cells[key("Kayla F.","HW 4.4")] = { status:"makeup",  score:null };
-})();
+/* =====================================================================
+   STATE — mirrors the database. Nothing is authoritative here; every
+   mutation writes to Supabase first, then we re-read into this shape.
+   ===================================================================== */
+const state = {
+  user: null,
+  classes: [], classId: null,
+  statuses: [],
+  students: [], assignments: [], topics: [],
+  cells: new Map(),          // "studentId|assignmentId" -> { status, score }
+};
 
-function mulberry(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const cellKey = (s, a) => `${s}|${a}`;
+const $ = id => document.getElementById(id);
 
-const table = document.getElementById('gridTable');
-function renderGrid(){
-  let html = "<thead><tr><th style='text-align:left'>Student</th>";
-  assignments.forEach(a=>{ html += `<th>${a.name}<span class="topic">${a.topic}</span></th>`; });
-  html += "</tr></thead><tbody>";
-  students.forEach(s=>{
-    html += `<tr><th>${s}</th>`;
-    assignments.forEach(a=>{
-      const c = cells[key(s,a.name)];
-      let inner="", cls=c.status;
-      if (c.status==="done") inner = (c.score==null?"—":c.score);
-      else if (c.status==="missing") inner = `—<span class="st">missing</span>`;
-      else if (c.status==="absent") inner = `—<span class="st">absent</span>`;
-      else if (c.status==="makeup") inner = `—<span class="st">makeup</span>`;
-      html += `<td class="cell ${cls}" data-s="${s}" data-a="${a.name}">${inner}</td>`;
-    });
-    html += "</tr>";
-  });
-  html += "</tbody>";
-  table.innerHTML = html;
-  table.querySelectorAll('.cell').forEach(td=>{
-    td.onclick = ()=> openEditor(td.dataset.s, td.dataset.a);
-  });
-  renderOwed();
-  renderTopics();
+/* Status helpers. Everything reads the statuses TABLE — no status name is
+   hardcoded in any view — so when Traci decides she wants "late", it shows up
+   in the editor, the legend, the owed list and the parser with no code change. */
+const stat = code => state.statuses.find(s => s.code === code);
+const owedStatuses = () => state.statuses.filter(s => s.is_owed);
+const defaultStatus = () => (state.statuses.find(s => s.expects_score) || state.statuses[0])?.code || 'done';
+
+function toast(msg, isErr = false) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => (t.className = 'toast'), 3200);
 }
 
-function renderOwed(){
-  const groups = { missing:[], absent:[], makeup:[] };
-  students.forEach(s=>{
-    assignments.forEach(a=>{
-      const c = cells[key(s,a.name)];
-      if (c.status!=="done") groups[c.status].push({s, a:a.name, topic:a.topic});
+/* Supabase returns { data, error }. Surfacing the error matters more than usual
+   here: a silent write failure would look exactly like a saved grade. */
+function ok(res, what) {
+  if (res.error) {
+    console.error(what, res.error);
+    toast(`Couldn't ${what} — ${res.error.message}`, true);
+    return false;
+  }
+  return true;
+}
+
+/* =====================================================================
+   AUTH — magic link only. No password exists anywhere in this app.
+   ===================================================================== */
+$('authBtn').onclick = async () => {
+  const email = $('authEmail').value.trim();
+  if (!email) return;
+  $('authBtn').disabled = true;
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href.split('#')[0] },
+  });
+  $('authBtn').disabled = false;
+  $('authMsg').className = 'msg ' + (error ? 'err' : 'ok');
+  $('authMsg').textContent = error
+    ? `Hmm — ${error.message}`
+    : '✉️ Check your email and tap the link. You can close this tab.';
+};
+
+const signOut = async () => { await sb.auth.signOut(); location.reload(); };
+$('signOutBtn').onclick = signOut;
+$('setupSignOut').onclick = signOut;
+
+/* =====================================================================
+   LOADING
+   ===================================================================== */
+async function loadStatuses() {
+  const res = await sb.from('statuses').select('*').order('sort_order');
+  if (!ok(res, 'load statuses')) return;
+  state.statuses = res.data;
+}
+
+async function loadClasses() {
+  const res = await sb.from('classes').select('*').order('sort_order').order('created_at');
+  if (!ok(res, 'load classes')) return;
+  state.classes = res.data;
+}
+
+async function loadClass(classId) {
+  state.classId = classId;
+  state.cells.clear();
+
+  const [stu, asg, top] = await Promise.all([
+    sb.from('students').select('*').eq('class_id', classId).order('sort_order').order('first_name'),
+    sb.from('assignments').select('id,name,points,sort_order,topic_id,topics(name)').eq('class_id', classId).order('sort_order'),
+    sb.from('topics').select('*').eq('class_id', classId).order('name'),
+  ]);
+  if (!ok(stu, 'load students') || !ok(asg, 'load assignments') || !ok(top, 'load topics')) return;
+
+  state.students = stu.data;
+  state.topics = top.data;
+  state.assignments = asg.data.map(a => ({ ...a, topic: a.topics?.name || 'Untagged' }));
+
+  if (state.assignments.length) {
+    const res = await sb.from('cells').select('*').in('assignment_id', state.assignments.map(a => a.id));
+    if (!ok(res, 'load grades')) return;
+    res.data.forEach(c => state.cells.set(cellKey(c.student_id, c.assignment_id), {
+      status: c.status,
+      score: c.score === null ? null : Number(c.score),
+    }));
+  }
+}
+
+/* =====================================================================
+   RENDER — gradebook grid. Everything else derives from this data.
+   ===================================================================== */
+function renderGrid() {
+  const cls = state.classes.find(c => c.id === state.classId);
+  $('gbTitle').textContent = cls ? cls.name : 'Gradebook';
+
+  const table = $('gridTable');
+
+  if (!state.students.length || !state.assignments.length) {
+    table.innerHTML = '';
+    const what = !state.students.length && !state.assignments.length ? 'students or assignments'
+               : !state.students.length ? 'students' : 'assignments';
+    table.innerHTML = `<tbody><tr><td style="padding:2rem;text-align:center">
+      <div class="empty-note">no ${what} yet — head to 🎒 Class Setup to add some</div>
+    </td></tr></tbody>`;
+    renderOwed(); renderTopics(); renderLegend();
+    return;
+  }
+
+  let html = "<thead><tr><th style='text-align:left'>Student</th>";
+  state.assignments.forEach(a => {
+    html += `<th>${esc(a.name)}<span class="topic">${esc(a.topic)}</span></th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  state.students.forEach(s => {
+    html += `<tr><th>${esc(s.display_name)}</th>`;
+    state.assignments.forEach(a => {
+      const c = state.cells.get(cellKey(s.id, a.id));
+      let inner, cls2;
+      if (!c) {                                  // no row yet = not entered
+        inner = '·'; cls2 = 'empty';
+      } else if (stat(c.status)?.expects_score) {
+        inner = c.score == null ? '—' : c.score; cls2 = c.status;
+      } else {
+        inner = `—<span class="st">${esc(c.status)}</span>`; cls2 = c.status;
+      }
+      html += `<td class="cell ${cls2}" data-s="${s.id}" data-a="${a.id}">${inner}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+
+  table.querySelectorAll('.cell').forEach(td => {
+    td.onclick = () => openEditor(td.dataset.s, td.dataset.a);
+  });
+
+  renderOwed(); renderTopics(); renderLegend();
+}
+
+function renderLegend() {
+  const colors = { missing: '#fde8ec', absent: '#fff3d1', makeup: '#e7f0fc' };
+  let html = state.statuses.filter(s => s.is_owed)
+    .map(s => `<span><span class="key" style="background:${colors[s.code] || '#e7f0fc'}"></span>${esc(s.label)}</span>`)
+    .join('');
+  html += `<span><span class="key" style="background:#fff;border:1px solid var(--gold-line)"></span>Graded</span>`;
+  html += `<span><span class="key" style="background:#fff;border:1px dashed #c3cbdd"></span>Not entered</span>`;
+  $('legend').innerHTML = html;
+}
+
+function renderOwed() {
+  const groups = {};
+  owedStatuses().forEach(s => (groups[s.code] = []));
+
+  state.students.forEach(s => {
+    state.assignments.forEach(a => {
+      const c = state.cells.get(cellKey(s.id, a.id));
+      if (c && groups[c.status]) {
+        groups[c.status].push({ who: s.display_name, what: a.name, topic: a.topic });
+      }
     });
   });
-  const total = groups.missing.length + groups.absent.length + groups.makeup.length;
-  document.getElementById('owedCount').textContent = total;
 
-  const titles = { missing:"❌ Missing work", absent:"🏠 Absent — needs the assignment", makeup:"🔄 Makeup pending" };
-  let html = "";
-  ["missing","absent","makeup"].forEach(g=>{
-    if (!groups[g].length) return;
-    html += `<div class="owed-group"><h3>${titles[g]} (${groups[g].length})</h3>`;
-    groups[g].forEach(item=>{
+  const total = Object.values(groups).reduce((n, g) => n + g.length, 0);
+  $('owedCount').textContent = total;
+
+  const titles = { missing: '❌ Missing work', absent: '🏠 Absent — needs the assignment', makeup: '🔄 Makeup pending' };
+  let html = '';
+  owedStatuses().forEach(st => {
+    const g = groups[st.code];
+    if (!g.length) return;
+    html += `<div class="owed-group"><h3>${esc(titles[st.code] || st.label)} (${g.length})</h3>`;
+    g.forEach(i => {
       html += `<div class="owed-item">
-        <div><span class="who">${item.s}</span> <span class="what">— ${item.a} · ${item.topic}</span></div>
-        <span class="tag ${g}">${g}</span></div>`;
+        <div><span class="who">${esc(i.who)}</span> <span class="what">— ${esc(i.what)} · ${esc(i.topic)}</span></div>
+        <span class="tag ${st.code}">${esc(st.code)}</span></div>`;
     });
-    html += "</div>";
+    html += '</div>';
   });
   if (!html) html = `<div class="all-clear">nothing owed — the herd is all caught up! 🐎🎉</div>`;
-  document.getElementById('owedList').innerHTML = html;
+  $('owedList').innerHTML = html;
 }
 
-function renderTopics(){
+function renderTopics() {
   const topics = {};
-  assignments.forEach(a=>{
-    students.forEach(s=>{
-      const c = cells[key(s,a.name)];
-      if (c.status==="done" && c.score!=null){
-        (topics[a.topic] = topics[a.topic]||[]).push(c.score);
+  state.assignments.forEach(a => {
+    state.students.forEach(s => {
+      const c = state.cells.get(cellKey(s.id, a.id));
+      // Only graded work counts. A missing paper isn't a zero — it's an unknown,
+      // and averaging it as zero would smear the topic average into nonsense.
+      if (c && stat(c.status)?.expects_score && c.score != null) {
+        (topics[a.topic] = topics[a.topic] || []).push(c.score);
       }
     });
   });
-  let html = "";
-  Object.entries(topics).sort((x,y)=>avg(x[1])-avg(y[1])).forEach(([topic,scores])=>{
+
+  const entries = Object.entries(topics);
+  if (!entries.length) {
+    $('topicBars').innerHTML = `<div class="empty-note">no graded work yet — the radar lights up once scores go in</div>`;
+    return;
+  }
+
+  let html = '';
+  entries.sort((x, y) => avg(x[1]) - avg(y[1])).forEach(([topic, scores]) => {
     const a = Math.round(avg(scores));
-    const cls = a>=80 ? "good" : a>=70 ? "warn" : "bad";
+    const cls = a >= 80 ? 'good' : a >= 70 ? 'warn' : 'bad';
     html += `<div class="topic-row">
-      <div class="topic-head"><span>${topic}</span><span class="avg">${a}%</span></div>
+      <div class="topic-head"><span>${esc(topic)}</span><span class="avg">${a}%</span></div>
       <div class="bar-track"><div class="bar ${cls}" style="width:${a}%"></div></div>
-      ${cls==="bad" ? `<div class="flag">⚠ strong re-teach candidate — class avg under 70</div>`:""}
+      ${cls === 'bad' ? `<div class="flag">⚠ strong re-teach candidate — class avg under 70</div>` : ''}
     </div>`;
   });
-  document.getElementById('topicBars').innerHTML = html;
+  $('topicBars').innerHTML = html;
 }
-function avg(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
 
-document.querySelectorAll('.tab').forEach(t=>{
-  t.onclick = ()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById(t.dataset.panel).classList.add('active');
-  };
-});
+const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+/* =====================================================================
+   CELL EDITOR
+   ===================================================================== */
 let editing = null;
-const editor = document.getElementById('editor');
-function openEditor(s,a){
-  editing = {s,a};
-  const asg = assignments.find(x=>x.name===a);
-  const c = cells[key(s,a)];
-  document.getElementById('edTitle').textContent = `${s} — ${a}`;
-  document.getElementById('edCtx').textContent = `Topic: ${asg.topic}`;
-  document.getElementById('scoreInput').value = c.score==null?"":c.score;
-  document.querySelectorAll('.status-btn').forEach(b=>{
-    b.classList.toggle('sel', b.dataset.status===c.status);
+const editor = $('editor');
+
+function openEditor(sid, aid) {
+  editing = { sid, aid };
+  const s = state.students.find(x => x.id === sid);
+  const a = state.assignments.find(x => x.id === aid);
+  const c = state.cells.get(cellKey(sid, aid));
+  const current = c?.status || defaultStatus();
+
+  $('edTitle').textContent = `${s.display_name} — ${a.name}`;
+  $('edCtx').textContent = `Topic: ${a.topic}`;
+  $('scoreInput').value = c?.score ?? '';
+  $('scoreInput').max = a.points;
+  $('pointsHint').textContent = `/ ${a.points}`;
+
+  const icons = { done: '✅', missing: '❌', absent: '🏠', makeup: '🔄' };
+  $('statusRow').innerHTML = state.statuses.map(st =>
+    `<button class="status-btn ${st.code === current ? 'sel' : ''}" data-status="${st.code}">
+       ${icons[st.code] || '•'} ${esc(st.label)}
+     </button>`).join('');
+
+  $('statusRow').querySelectorAll('.status-btn').forEach(b => {
+    b.onclick = () => {
+      $('statusRow').querySelectorAll('.status-btn').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      syncScoreLine();
+    };
   });
+
+  syncScoreLine();
   editor.classList.add('open');
 }
-document.querySelectorAll('.status-btn').forEach(b=>{
-  b.onclick = ()=>{
-    document.querySelectorAll('.status-btn').forEach(x=>x.classList.remove('sel'));
-    b.classList.add('sel');
-  };
-});
-function closeEditor(){ editor.classList.remove('open'); editing=null; }
-function saveEditor(){
+
+/* The database rejects a score on a non-scoring status (there's a trigger for
+   it). Rather than let her hit that error, grey the field out to match. */
+function syncScoreLine() {
+  const code = $('statusRow').querySelector('.status-btn.sel')?.dataset.status;
+  const scores = !!stat(code)?.expects_score;
+  $('scoreLine').classList.toggle('off', !scores);
+  $('scoreInput').disabled = !scores;
+  if (!scores) $('scoreInput').value = '';
+}
+
+const closeEditor = () => { editor.classList.remove('open'); editing = null; };
+$('edCancel').onclick = closeEditor;
+editor.addEventListener('click', e => { if (e.target === editor) closeEditor(); });
+
+$('edSave').onclick = async () => {
   if (!editing) return;
-  const status = document.querySelector('.status-btn.sel')?.dataset.status || "done";
-  const raw = document.getElementById('scoreInput').value;
-  const score = raw==="" ? null : Math.max(0, Math.min(100, Number(raw)));
-  cells[key(editing.s, editing.a)] = { status, score: status==="done" ? score : null };
+  const status = $('statusRow').querySelector('.status-btn.sel')?.dataset.status || defaultStatus();
+  const a = state.assignments.find(x => x.id === editing.aid);
+  const raw = $('scoreInput').value;
+  let score = raw === '' ? null : Math.max(0, Math.min(a.points, Number(raw)));
+  if (!stat(status)?.expects_score) score = null;
+
+  const { sid, aid } = editing;
   closeEditor();
+  await saveCell(sid, aid, status, score);
   renderGrid();
-}
-editor.addEventListener('click', e=>{ if(e.target===editor) closeEditor(); });
+};
 
-function mockExport(){
-  let csv = "Student," + assignments.map(a=>a.name).join(",") + "\n";
-  students.forEach(s=>{
-    csv += s + "," + assignments.map(a=>{
-      const c = cells[key(s,a.name)];
-      return c.status==="done" ? (c.score??"") : c.status.toUpperCase();
-    }).join(",") + "\n";
-  });
-  const blob = new Blob([csv], {type:"text/csv"});
-  const url = URL.createObjectURL(blob);
-  const el = document.createElement('a');
-  el.href = url; el.download = "mustang-tracker-grades.csv";
-  el.click();
-  URL.revokeObjectURL(url);
+async function saveCell(student_id, assignment_id, status, score) {
+  const res = await sb.from('cells')
+    .upsert({ student_id, assignment_id, status, score }, { onConflict: 'student_id,assignment_id' });
+  if (!ok(res, 'save that grade')) return false;
+  state.cells.set(cellKey(student_id, assignment_id), { status, score });
+  return true;
 }
 
-/* ---------- VOICE ENTRY ---------- */
-const voiceAsg = document.getElementById('voiceAsg');
-assignments.forEach(a=>{
-  const o = document.createElement('option');
-  o.value = a.name; o.textContent = `${a.name} — ${a.topic}`;
-  voiceAsg.appendChild(o);
-});
-
-const micBtn = document.getElementById('micBtn');
-const micStatus = document.getElementById('micStatus');
-const voiceText = document.getElementById('voiceText');
-let recog = null, listening = false;
-
+/* =====================================================================
+   MIC — one factory, two mics (grades + roster). The live Web Speech mic is
+   a bonus; the textarea is the guaranteed path, because iPad keyboard
+   dictation types straight into it and always works.
+   ===================================================================== */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (SR) {
-  recog = new SR();
+
+function wireMic(btnId, statusId, textId) {
+  const btn = $(btnId), status = $(statusId), text = $(textId);
+  if (!SR) {
+    btn.style.display = 'none';
+    status.textContent = "no browser mic here — use the keyboard's 🎙 dictation in the box below";
+    return;
+  }
+  const recog = new SR();
   recog.continuous = true;
   recog.interimResults = true;
   recog.lang = 'en-US';
-  recog.onresult = (e)=>{
-    let final = "";
-    for (let i=0;i<e.results.length;i++){
-      if (e.results[i].isFinal) final += e.results[i][0].transcript + " ";
+  let listening = false;
+
+  recog.onresult = e => {
+    let final = '';
+    for (let i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
     }
-    if (final) voiceText.value = (voiceText.value + " " + final).trim();
-    micStatus.textContent = "listening… talk naturally";
+    if (final) text.value = (text.value + ' ' + final).trim();
+    status.textContent = 'listening… talk naturally';
   };
-  recog.onend = ()=>{ if (listening) { try{recog.start();}catch(_){}} else { micStatus.textContent = ""; } };
-  recog.onerror = ()=>{ micStatus.textContent = "mic hiccup — the ⌨️ 🎙 dictation below always works"; };
-} else {
-  micBtn.style.display = "none";
-  micStatus.textContent = "no browser mic here — use the iPad keyboard's 🎙 dictation in the box below";
+  recog.onend = () => { if (listening) { try { recog.start(); } catch (_) {} } else status.textContent = ''; };
+  recog.onerror = () => { status.textContent = 'mic hiccup — the ⌨️ 🎙 dictation below always works'; };
+
+  btn.onclick = () => {
+    listening = !listening;
+    if (listening) {
+      try { recog.start(); } catch (_) {}
+      btn.textContent = '⏹ Stop';
+      btn.classList.add('listening');
+      status.textContent = 'listening… talk naturally';
+    } else {
+      recog.stop();
+      btn.textContent = btnId === 'micBtn' ? '🎤 Start listening' : '🎤 Speak the roster';
+      btn.classList.remove('listening');
+      status.textContent = '';
+    }
+  };
 }
 
-micBtn.onclick = ()=>{
-  if (!recog) return;
-  if (!listening) {
-    listening = true;
-    try { recog.start(); } catch(_){}
-    micBtn.textContent = "⏹ Stop";
-    micBtn.classList.add('listening');
-    micStatus.textContent = "listening… talk naturally";
-  } else {
-    listening = false;
-    recog.stop();
-    micBtn.textContent = "🎤 Start listening";
-    micBtn.classList.remove('listening');
-    micStatus.textContent = "";
+/* =====================================================================
+   VOICE → GRADES.  Review-before-apply is non-negotiable: nothing here
+   writes to the gradebook until she taps Apply.
+   ===================================================================== */
+let pendingGrades = null;
+
+function parseVoice() {
+  const raw = $('voiceText').value.trim();
+  const area = $('reviewArea');
+  if (!raw) { area.innerHTML = `<div class="mic-status">nothing to review yet — speak or dictate first</div>`; return; }
+  if (!state.assignments.length) { area.innerHTML = `<div class="mic-status">add an assignment first (🎒 Class Setup)</div>`; return; }
+
+  const parsed = parseGrades(raw, state.students, state.statuses);
+
+  if (!parsed.length) {
+    area.innerHTML = `<div class="mic-status">couldn't find any "name + score/status" pairs in that — try "Marcus 78, Kayla absent"</div>`;
+    return;
   }
-};
 
-/* number words for scores spoken as words */
-const wordNums = { "one hundred":100,"hundred":100,"ninety":90,"eighty":80,"seventy":70,"sixty":60,"fifty":50,"forty":40,"thirty":30,"twenty":20,"ten":10,"zero":0 };
+  pendingGrades = parsed;
+  const asgName = state.assignments.find(a => a.id === $('voiceAsg').value)?.name || '';
+  let html = `<h3 style="font-size:0.95rem;margin:0.6rem 0 0.5rem;">Heard for <u>${esc(asgName)}</u> — tap ✕ to drop a line, then apply:</h3>`;
 
-function matchStudent(token){
-  const t = token.toLowerCase().trim();
-  if (!t) return null;
-  let best = null;
-  students.forEach(s=>{
-    const first = s.split(" ")[0].toLowerCase();
-    if (t === first || t.startsWith(first) || first.startsWith(t)) best = s;
-  });
-  return best;
-}
-
-function parseVoice(){
-  const raw = voiceText.value.trim();
-  const area = document.getElementById('reviewArea');
-  if (!raw){ area.innerHTML = `<div class="mic-status">nothing to review yet — speak or dictate first</div>`; return; }
-
-  const chunks = raw.split(/,|\band\b|\.|;/i).map(c=>c.trim()).filter(Boolean);
-  const parsed = [];
-
-  chunks.forEach(chunk=>{
-    const lower = chunk.toLowerCase();
-    let status = null;
-    if (/\babsent\b/.test(lower)) status = "absent";
-    else if (/\bmissing\b|\bdidn'?t turn\b|\bno work\b/.test(lower)) status = "missing";
-    else if (/\bmake ?up\b|\bmakeup\b/.test(lower)) status = "makeup";
-
-    let score = null;
-    const digits = lower.match(/\b(\d{1,3})\b/);
-    if (digits) score = Math.min(100, Number(digits[1]));
-    else {
-      for (const [w,v] of Object.entries(wordNums)){
-        const m = lower.match(new RegExp(`\\b${w}\\b(?:[ -](one|two|three|four|five|six|seven|eight|nine))?`));
-        if (m){
-          const ones = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9}[m[1]] || 0;
-          score = Math.min(100, v + ones); break;
-        }
-      }
-    }
-
-    const nameToken = chunk.replace(/\d+/g,"").replace(/\b(absent|missing|makeup|make up|got|scored|a|an|is|was)\b/gi,"").trim();
-    const student = matchStudent(nameToken);
-
-    if (student && (score!=null || status)){
-      parsed.push({ student, score: status? null : score, status: status || "done", heard: chunk, ok: true });
-    } else if (chunk.length > 1){
-      parsed.push({ student: null, score, status, heard: chunk, ok: false });
-    }
-  });
-
-  if (!parsed.length){ area.innerHTML = `<div class="mic-status">couldn't find any "name + score/status" pairs in that — try "Marcus 78, Kayla absent"</div>`; return; }
-
-  window._pendingParse = parsed;
-  let html = `<h3 style="font-size:0.95rem;margin:0.6rem 0 0.5rem;">Heard for <u>${voiceAsg.value}</u> — tap ✕ to drop a line, then apply:</h3>`;
-  parsed.forEach((p,i)=>{
-    if (p.ok){
-      const what = p.status==="done" ? `score <b>${p.score}</b>` : `<b>${p.status}</b>`;
+  parsed.forEach((p, i) => {
+    if (p.ok) {
+      const what = stat(p.status)?.expects_score ? `score <b>${p.score}</b>` : `<b>${esc(p.status)}</b>`;
       html += `<div class="review-item" data-i="${i}">
-        <div><span class="parsed">${p.student}</span> → ${what}<div class="heard">heard: "${p.heard}"</div></div>
-        <button class="drop" onclick="dropParse(${i})">✕</button></div>`;
+        <div><span class="parsed">${esc(p.student.display_name)}</span> → ${what}
+          <div class="heard">heard: "${esc(p.heard)}"</div></div>
+        <button class="drop" data-drop="${i}">✕</button></div>`;
+    } else if (p.ambiguous) {
+      html += `<div class="review-item bad" data-i="${i}">
+        <div><span class="parsed">Two students match — which one?</span>
+          <div class="heard">heard: "${esc(p.heard)}"</div>
+          <div style="margin-top:0.35rem;display:flex;gap:0.35rem;flex-wrap:wrap">
+            ${p.ambiguous.map(s => `<button class="mini-btn cancel" data-pick="${i}" data-sid="${s.id}">${esc(s.display_name)}</button>`).join('')}
+          </div></div>
+        <button class="drop" data-drop="${i}">✕</button></div>`;
     } else {
       html += `<div class="review-item bad" data-i="${i}">
-        <div><span class="parsed">Didn't catch a student</span><div class="heard">heard: "${p.heard}"</div></div>
-        <button class="drop" onclick="dropParse(${i})">✕</button></div>`;
+        <div><span class="parsed">Didn't catch a student</span>
+          <div class="heard">heard: "${esc(p.heard)}"</div></div>
+        <button class="drop" data-drop="${i}">✕</button></div>`;
     }
   });
-  html += `<div class="apply-row"><button class="big-btn" onclick="applyParse()">✅ Apply to gradebook</button></div>`;
+
+  html += `<div class="apply-row"><button class="big-btn" id="applyBtn">✅ Apply to gradebook</button></div>`;
   area.innerHTML = html;
-}
 
-function dropParse(i){
-  window._pendingParse[i].dropped = true;
-  document.querySelector(`.review-item[data-i="${i}"]`)?.remove();
-}
-
-function applyParse(){
-  const asg = voiceAsg.value;
-  let applied = 0;
-  (window._pendingParse||[]).forEach(p=>{
-    if (p.dropped || !p.ok) return;
-    cells[key(p.student, asg)] = { status: p.status, score: p.status==="done" ? p.score : null };
-    applied++;
+  area.querySelectorAll('[data-drop]').forEach(b => {
+    b.onclick = () => {
+      pendingGrades[+b.dataset.drop].dropped = true;
+      area.querySelector(`.review-item[data-i="${b.dataset.drop}"]`)?.remove();
+    };
   });
+  // Disambiguation: tapping the right kid promotes the line to applicable.
+  area.querySelectorAll('[data-pick]').forEach(b => {
+    b.onclick = () => {
+      const p = pendingGrades[+b.dataset.pick];
+      p.student = state.students.find(s => s.id === b.dataset.sid);
+      p.ok = true;
+      p.status = p.status || defaultStatus();
+      p.score = p.status && !stat(p.status)?.expects_score ? null : p.score;
+      parseVoiceRerender();
+    };
+  });
+  $('applyBtn').onclick = applyParse;
+}
+
+/* Re-render the review list from the pending set, preserving drops/picks. */
+function parseVoiceRerender() {
+  const keep = pendingGrades;
+  const area = $('reviewArea');
+  const asgName = state.assignments.find(a => a.id === $('voiceAsg').value)?.name || '';
+  let html = `<h3 style="font-size:0.95rem;margin:0.6rem 0 0.5rem;">Heard for <u>${esc(asgName)}</u> — tap ✕ to drop a line, then apply:</h3>`;
+  keep.forEach((p, i) => {
+    if (p.dropped) return;
+    if (p.ok) {
+      const what = stat(p.status)?.expects_score ? `score <b>${p.score}</b>` : `<b>${esc(p.status)}</b>`;
+      html += `<div class="review-item" data-i="${i}">
+        <div><span class="parsed">${esc(p.student.display_name)}</span> → ${what}
+          <div class="heard">heard: "${esc(p.heard)}"</div></div>
+        <button class="drop" data-drop="${i}">✕</button></div>`;
+    } else {
+      html += `<div class="review-item bad" data-i="${i}">
+        <div><span class="parsed">${p.ambiguous ? 'Two students match — which one?' : "Didn't catch a student"}</span>
+          <div class="heard">heard: "${esc(p.heard)}"</div>
+          ${p.ambiguous ? `<div style="margin-top:0.35rem;display:flex;gap:0.35rem;flex-wrap:wrap">
+            ${p.ambiguous.map(s => `<button class="mini-btn cancel" data-pick="${i}" data-sid="${s.id}">${esc(s.display_name)}</button>`).join('')}
+          </div>` : ''}
+        </div>
+        <button class="drop" data-drop="${i}">✕</button></div>`;
+    }
+  });
+  html += `<div class="apply-row"><button class="big-btn" id="applyBtn">✅ Apply to gradebook</button></div>`;
+  area.innerHTML = html;
+  area.querySelectorAll('[data-drop]').forEach(b => {
+    b.onclick = () => { pendingGrades[+b.dataset.drop].dropped = true; parseVoiceRerender(); };
+  });
+  area.querySelectorAll('[data-pick]').forEach(b => {
+    b.onclick = () => {
+      const p = pendingGrades[+b.dataset.pick];
+      p.student = state.students.find(s => s.id === b.dataset.sid);
+      p.ok = true;
+      p.status = p.status || defaultStatus();
+      parseVoiceRerender();
+    };
+  });
+  $('applyBtn').onclick = applyParse;
+}
+
+async function applyParse() {
+  const aid = $('voiceAsg').value;
+  const rows = (pendingGrades || []).filter(p => p.ok && !p.dropped).map(p => ({
+    student_id: p.student.id,
+    assignment_id: aid,
+    status: p.status,
+    score: stat(p.status)?.expects_score ? p.score : null,
+  }));
+  if (!rows.length) { toast('nothing to apply', true); return; }
+
+  $('applyBtn').disabled = true;
+  const res = await sb.from('cells').upsert(rows, { onConflict: 'student_id,assignment_id' });
+  if (!ok(res, 'apply those grades')) { $('applyBtn').disabled = false; return; }
+
+  rows.forEach(r => state.cells.set(cellKey(r.student_id, r.assignment_id), { status: r.status, score: r.score }));
+  const asgName = state.assignments.find(a => a.id === aid)?.name || '';
   renderGrid();
-  document.getElementById('reviewArea').innerHTML =
-    `<div class="mic-status" style="font-size:1.2rem;color:var(--blue);">✅ applied ${applied} grade${applied===1?"":"s"} to ${asg} — check the Gradebook tab!</div>`;
-  voiceText.value = "";
-  window._pendingParse = null;
+  $('reviewArea').innerHTML =
+    `<div class="mic-status" style="font-size:1.2rem;color:var(--blue);">✅ applied ${rows.length} grade${rows.length === 1 ? '' : 's'} to ${esc(asgName)} — check the Gradebook tab!</div>`;
+  $('voiceText').value = '';
+  pendingGrades = null;
 }
 
-function clearVoice(){
-  voiceText.value = "";
-  document.getElementById('reviewArea').innerHTML = "";
-  window._pendingParse = null;
+$('voiceReview').onclick = parseVoice;
+$('voiceClear').onclick = () => {
+  $('voiceText').value = '';
+  $('reviewArea').innerHTML = '';
+  pendingGrades = null;
+};
+
+/* =====================================================================
+   ROSTER — three ways in: type, talk, or CSV. All three land in the same
+   review step, and all three go through addStudents().
+   ===================================================================== */
+async function addStudents(names) {
+  if (!names.length) return 0;
+  const rows = names.map((n, i) => {
+    const parts = splitName(n);
+    return parts && { ...parts, class_id: state.classId, sort_order: state.students.length + i };
+  }).filter(Boolean);
+
+  if (!rows.length) return 0;
+  const res = await sb.from('students').insert(rows);
+  if (!ok(res, 'add those students')) return 0;
+
+  await loadClass(state.classId);
+  renderAll();
+  toast(`added ${rows.length} student${rows.length === 1 ? '' : 's'}`);
+  return rows.length;
 }
 
-renderGrid();
+$('addStudentBtn').onclick = async () => {
+  const raw = $('addStudentInput').value.trim();
+  if (!raw) return;
+  const names = raw.split(/[,;\n]/).map(s => s.trim()).filter(Boolean);
+  const n = await addStudents(names);
+  if (n) $('addStudentInput').value = '';
+};
+$('addStudentInput').onkeydown = e => { if (e.key === 'Enter') $('addStudentBtn').click(); };
+
+/* ---- CSV import (parseCsvNames lives in lib.js, under test) ---- */
+$('csvFile').onchange = async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  const names = parseCsvNames(text);
+  if (!names.length) { toast("couldn't find any names in that CSV", true); return; }
+  await addStudents(names);
+  e.target.value = '';
+};
+
+/* ---- Voice roster: same review-before-apply contract as grades ---- */
+let pendingNames = null;
+
+$('rosterReview').onclick = () => {
+  const raw = $('rosterText').value.trim();
+  const area = $('rosterReviewArea');
+  if (!raw) { area.innerHTML = `<div class="mic-status">nothing to review yet — speak or dictate first</div>`; return; }
+
+  const names = parseRosterNames(raw);
+
+  if (!names.length) { area.innerHTML = `<div class="mic-status">didn't catch any names — try "Avery Brooks, Marcus Davis"</div>`; return; }
+
+  pendingNames = names.map(n => ({ name: n, dup: state.students.some(s => s.display_name.toLowerCase().startsWith(n.split(' ')[0].toLowerCase())) }));
+
+  let html = `<h3 style="font-size:0.95rem;margin:0.6rem 0 0.5rem;">Heard these names — tap ✕ to drop one, then add:</h3>`;
+  pendingNames.forEach((p, i) => {
+    html += `<div class="review-item ${p.dup ? 'bad' : ''}" data-i="${i}">
+      <div><span class="parsed">${esc(p.name)}</span>
+        ${p.dup ? `<div class="heard">already someone by that first name — check before adding</div>` : ''}
+      </div>
+      <button class="drop" data-drop="${i}">✕</button></div>`;
+  });
+  html += `<div class="apply-row"><button class="big-btn" id="applyNamesBtn">✅ Add to roster</button></div>`;
+  area.innerHTML = html;
+
+  area.querySelectorAll('[data-drop]').forEach(b => {
+    b.onclick = () => {
+      pendingNames[+b.dataset.drop].dropped = true;
+      area.querySelector(`.review-item[data-i="${b.dataset.drop}"]`)?.remove();
+    };
+  });
+  $('applyNamesBtn').onclick = async () => {
+    const keep = pendingNames.filter(p => !p.dropped).map(p => p.name);
+    const n = await addStudents(keep);
+    if (n) {
+      $('rosterText').value = '';
+      area.innerHTML = `<div class="mic-status" style="color:var(--blue)">✅ added ${n} to the roster</div>`;
+      pendingNames = null;
+    }
+  };
+};
+$('rosterClear').onclick = () => {
+  $('rosterText').value = '';
+  $('rosterReviewArea').innerHTML = '';
+  pendingNames = null;
+};
+
+async function removeStudent(id) {
+  const s = state.students.find(x => x.id === id);
+  if (!confirm(`Remove ${s.display_name}? Their grades go too.`)) return;
+  const res = await sb.from('students').delete().eq('id', id);
+  if (!ok(res, 'remove that student')) return;
+  await loadClass(state.classId);
+  renderAll();
+  toast(`removed ${s.display_name}`);
+}
+
+/* ---- Assignments ---- */
+async function addAssignment(name, topicName, points) {
+  let topic_id = null;
+  if (topicName) {
+    const existing = state.topics.find(t => t.name.toLowerCase() === topicName.toLowerCase());
+    if (existing) topic_id = existing.id;
+    else {
+      const res = await sb.from('topics').insert({ class_id: state.classId, name: topicName }).select().single();
+      if (!ok(res, 'create that topic')) return;
+      topic_id = res.data.id;
+    }
+  }
+  const res = await sb.from('assignments').insert({
+    class_id: state.classId, name, topic_id, points,
+    sort_order: state.assignments.length,
+  });
+  if (!ok(res, 'add that assignment')) return;
+  await loadClass(state.classId);
+  renderAll();
+  toast(`added ${name}`);
+}
+
+$('addAsgBtn').onclick = async () => {
+  const name = $('addAsgName').value.trim();
+  const topic = $('addAsgTopic').value.trim();
+  const points = Math.max(1, Number($('addAsgPoints').value) || 100);
+  if (!name) { toast('give the assignment a name', true); return; }
+  await addAssignment(name, topic, points);
+  $('addAsgName').value = '';
+  $('addAsgTopic').value = '';
+};
+
+async function removeAssignment(id) {
+  const a = state.assignments.find(x => x.id === id);
+  if (!confirm(`Remove ${a.name}? Every score on it goes too.`)) return;
+  const res = await sb.from('assignments').delete().eq('id', id);
+  if (!ok(res, 'remove that assignment')) return;
+  await loadClass(state.classId);
+  renderAll();
+  toast(`removed ${a.name}`);
+}
+
+function renderRoster() {
+  $('studentCount').textContent = state.students.length ? `— ${state.students.length}` : '';
+  $('asgCount').textContent = state.assignments.length ? `— ${state.assignments.length}` : '';
+
+  $('studentChips').innerHTML = state.students.length
+    ? state.students.map(s => `<span class="chip">${esc(s.display_name)}
+        <span class="x" data-rm-student="${s.id}">✕</span></span>`).join('')
+    : `<div class="empty-note">no students yet — add them below</div>`;
+
+  $('asgChips').innerHTML = state.assignments.length
+    ? state.assignments.map(a => `<span class="chip">${esc(a.name)}
+        <span class="sub2">${esc(a.topic)}</span>
+        <span class="x" data-rm-asg="${a.id}">✕</span></span>`).join('')
+    : `<div class="empty-note">no assignments yet — add one below</div>`;
+
+  $('studentChips').querySelectorAll('[data-rm-student]').forEach(b => {
+    b.onclick = () => removeStudent(b.dataset.rmStudent);
+  });
+  $('asgChips').querySelectorAll('[data-rm-asg]').forEach(b => {
+    b.onclick = () => removeAssignment(b.dataset.rmAsg);
+  });
+
+  $('topicList').innerHTML = state.topics.map(t => `<option value="${esc(t.name)}">`).join('');
+}
+
+/* ---- Classes / periods ---- */
+async function createClass(name) {
+  const res = await sb.from('classes').insert({
+    name, owner_id: state.user.id, sort_order: state.classes.length,
+  }).select().single();
+  if (!ok(res, 'create that class')) return null;
+  return res.data;
+}
+
+$('addClassBtn').onclick = async () => {
+  const name = $('addClassName').value.trim();
+  if (!name) return;
+  const c = await createClass(name);
+  if (!c) return;
+  $('addClassName').value = '';
+  await loadClasses();
+  await switchClass(c.id);
+  toast(`added ${name}`);
+};
+
+$('deleteClassBtn').onclick = async () => {
+  const cls = state.classes.find(c => c.id === state.classId);
+  if (!confirm(`Delete "${cls.name}" and everything in it — students, assignments, grades?`)) return;
+  const res = await sb.from('classes').delete().eq('id', state.classId);
+  if (!ok(res, 'delete that class')) return;
+  await loadClasses();
+  if (!state.classes.length) { showSetup(); return; }
+  await switchClass(state.classes[0].id);
+  toast('class deleted');
+};
+
+async function switchClass(id) {
+  await loadClass(id);
+  renderAll();
+}
+
+$('classPicker').onchange = e => switchClass(e.target.value);
+
+/* =====================================================================
+   EXPORT
+   ===================================================================== */
+$('exportBtn').onclick = () => {
+  if (!state.students.length || !state.assignments.length) { toast('nothing to export yet', true); return; }
+  const csv = toCsv({
+    students: state.students,
+    assignments: state.assignments,
+    cells: state.cells,
+    statuses: state.statuses,
+  });
+  const cls = state.classes.find(c => c.id === state.classId);
+  const slug = (cls?.name || 'class').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const el = document.createElement('a');
+  el.href = url;
+  el.download = `mustang-tracker-${slug}.csv`;
+  el.click();
+  URL.revokeObjectURL(url);
+  toast('CSV downloaded');
+};
+
+/* =====================================================================
+   DEMO CLASS — the mockup's fictional roster, made real. Deterministic
+   (mulberry(42)) so the demo looks the same every single time.
+   ===================================================================== */
+const mulberry = a => () => {
+  a |= 0; a = a + 0x6D2B79F5 | 0;
+  let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+  return ((t ^ t >>> 14) >>> 0) / 4294967296;
+};
+
+const DEMO_STUDENTS = [
+  ['Avery', 'Brooks'], ['Marcus', 'Davis'], ['Kayla', 'Fields'], ['Josh', 'Grant'],
+  ['Emma', 'Hayes'], ['Liam', 'Jennings'], ['Sofia', 'Marin'], ['Tyler', 'Prince'],
+  ['Grace', 'Rowe'], ['Diego', 'Santos'],
+];
+const DEMO_ASSIGNMENTS = [
+  ['HW 4.1', 'Two-step equations'], ['Quiz 4.1', 'Two-step equations'],
+  ['HW 4.2', 'Distributive property'], ['Quiz 4.2', 'Distributive property'],
+  ['HW 4.3', 'Proportions'], ['Quiz 4.3', 'Proportions'],
+  ['HW 4.4', 'Percent problems'], ['Test Ch. 4', 'Chapter 4 mixed'],
+];
+
+async function loadDemoClass() {
+  $('demoBtn').disabled = true;
+  $('setupMsg').className = 'msg ok';
+  $('setupMsg').textContent = 'building the demo class…';
+
+  const cls = await createClass('2nd Period — Pre-Algebra');
+  if (!cls) { $('demoBtn').disabled = false; return; }
+
+  const topicNames = [...new Set(DEMO_ASSIGNMENTS.map(a => a[1]))];
+  const tRes = await sb.from('topics').insert(topicNames.map(n => ({ class_id: cls.id, name: n }))).select();
+  if (!ok(tRes, 'seed topics')) return;
+  const topicId = Object.fromEntries(tRes.data.map(t => [t.name, t.id]));
+
+  const aRes = await sb.from('assignments').insert(DEMO_ASSIGNMENTS.map(([name, topic], i) => ({
+    class_id: cls.id, name, topic_id: topicId[topic], points: 100, sort_order: i,
+  }))).select();
+  if (!ok(aRes, 'seed assignments')) return;
+
+  const sRes = await sb.from('students').insert(DEMO_STUDENTS.map(([first_name, last_name], i) => ({
+    class_id: cls.id, first_name, last_name, sort_order: i,
+  }))).select();
+  if (!ok(sRes, 'seed students')) return;
+
+  // Same generator, same seed, same shape as the mockup Traci already saw.
+  const asgByName = Object.fromEntries(aRes.data.map(a => [a.name, a]));
+  const stuBySort = [...sRes.data].sort((x, y) => x.sort_order - y.sort_order);
+  const rnd = mulberry(42);
+  const rows = [];
+
+  stuBySort.forEach((s, si) => {
+    DEMO_ASSIGNMENTS.forEach(([name, topic]) => {
+      const a = asgByName[name];
+      let status = 'done', score = null;
+      const r = rnd();
+      if (r < 0.06) status = 'missing';
+      else if (r < 0.11) status = 'absent';
+      else if (r < 0.15) status = 'makeup';
+      if (status === 'done') {
+        let base = 72 + (si % 4) * 6;
+        if (topic === 'Distributive property') base -= 14;   // the weak topic
+        if (topic === 'Percent problems') base -= 7;
+        score = Math.max(38, Math.min(100, Math.round(base + (rnd() * 22 - 11))));
+      }
+      rows.push({ student_id: s.id, assignment_id: a.id, status, score });
+    });
+  });
+
+  // A few hand-set cells so the demo always has a story to tell.
+  const pin = (first, asg, status) => {
+    const s = stuBySort.find(x => x.first_name === first);
+    const r = rows.find(x => x.student_id === s.id && x.assignment_id === asgByName[asg].id);
+    if (r) { r.status = status; r.score = null; }
+  };
+  pin('Josh', 'Quiz 4.2', 'missing');
+  pin('Josh', 'HW 4.3', 'missing');
+  pin('Kayla', 'Quiz 4.3', 'absent');
+  pin('Kayla', 'HW 4.4', 'makeup');
+
+  const cRes = await sb.from('cells').insert(rows);
+  if (!ok(cRes, 'seed grades')) return;
+
+  await loadClasses();
+  await switchClass(cls.id);
+  showApp();
+  toast('demo class loaded 🐎');
+}
+$('demoBtn').onclick = loadDemoClass;
+
+$('createClassBtn').onclick = async () => {
+  const name = $('newClassName').value.trim();
+  if (!name) { $('setupMsg').className = 'msg err'; $('setupMsg').textContent = 'give the class a name first'; return; }
+  const c = await createClass(name);
+  if (!c) return;
+  await loadClasses();
+  await switchClass(c.id);
+  showApp();
+};
+
+/* =====================================================================
+   RENDER-ALL / SCREENS / BOOT
+   ===================================================================== */
+function renderAll() {
+  // class picker
+  $('classPicker').innerHTML = state.classes
+    .map(c => `<option value="${c.id}" ${c.id === state.classId ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+
+  // assignment picker for voice
+  $('voiceAsg').innerHTML = state.assignments
+    .map(a => `<option value="${a.id}">${esc(a.name)} — ${esc(a.topic)}</option>`).join('');
+
+  renderGrid();
+  renderRoster();
+}
+
+const show = el => { $('authScreen').style.display = 'none'; $('setupScreen').style.display = 'none'; $('app').style.display = 'none'; $(el).style.display = 'block'; };
+const showAuth = () => show('authScreen');
+const showSetup = () => { $('setupEmail').textContent = state.user?.email || ''; show('setupScreen'); };
+const showApp = () => { $('userEmail').textContent = state.user?.email || ''; show('app'); };
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    $(t.dataset.panel).classList.add('active');
+  };
+});
+
+wireMic('micBtn', 'micStatus', 'voiceText');
+wireMic('rosterMicBtn', 'rosterMicStatus', 'rosterText');
+
+async function boot() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showAuth(); return; }
+
+  state.user = session.user;
+  await loadStatuses();
+  await loadClasses();
+
+  if (!state.classes.length) { showSetup(); return; }
+
+  await loadClass(state.classes[0].id);
+  renderAll();
+  showApp();
+}
+
+// Magic link returns with tokens in the URL hash; supabase-js consumes them and
+// fires SIGNED_IN. Re-boot so the app comes up already signed in.
+sb.auth.onAuthStateChange((event) => {
+  if (event === 'SIGNED_IN' && !state.user) boot();
+});
+
+boot();
 </script>
 </body>
 </html>

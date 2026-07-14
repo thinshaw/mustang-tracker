@@ -1,0 +1,21 @@
+project_id = "habffloatnxdcqooture"
+
+[auth]
+enabled = true
+# Where the magic link sends her back to. Without this, Supabase defaults to
+# localhost:3000 and every sign-in email lands on a dead page.
+site_url = "https://thinshaw.github.io/mustang-tracker/"
+additional_redirect_urls = [
+  "https://thinshaw.github.io/mustang-tracker/",
+  "http://localhost:8000",
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+enable_signup = true
+enable_anonymous_sign_ins = false
+
+[auth.email]
+enable_signup = true
+# Magic link only — no passwords anywhere in this app.
+enable_confirmations = false
+double_confirm_changes = true
