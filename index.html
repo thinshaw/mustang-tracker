@@ -11,258 +11,267 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Mustangs">
 <link rel="apple-touch-icon" href="./icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Gochi+Hand&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #16294d;        /* Mustang blue, deep */
-    --blue: #2455a4;        /* Mustang blue, bright */
-    --red: #c8102e;         /* Mustang red */
-    --red-soft: #fde8ec;
-    --blue-soft: #e7f0fc;
-    --gold-line: #e3e9f4;
-    --paper: #ffffff;
-    --cream: #f7faff;
-    --muted: #64749b;
+    --navy: #16294d;         /* Mustang navy — headings, primary text */
+    --blue: #2455a4;         /* Mustang blue — links, secondary accent */
+    --red: #c8102e;          /* Mustang red — brand accent, primary action */
+    --red-dark: #a90d26;
+    --ink: #1c2739;
+    --muted: #5d6880;
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --border: #e2e7f0;
+    --border-strong: #cdd5e3;
+    --tint-missing: #fbebed;  --text-missing: #b30f27;
+    --tint-absent:  #fcf4df;  --text-absent:  #8a6a00;
+    --tint-makeup:  #e9f0fa;  --text-makeup:  #24559f;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  button, input, select, textarea { font: inherit; color: inherit; }
   body {
-    font-family: 'Fredoka', system-ui, sans-serif;
-    color: var(--navy);
-    background:
-      radial-gradient(circle at 10% 12%, rgba(200,16,46,0.10), transparent 30%),
-      radial-gradient(circle at 90% 85%, rgba(36,85,164,0.14), transparent 32%),
-      linear-gradient(135deg, #eef3fb 0%, #fdf1f3 100%);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 15px; line-height: 1.5;
+    color: var(--ink);
+    background: var(--bg);
     min-height: 100vh;
-    padding: 1.2rem 1rem 4rem;
+    padding: 1.6rem 1.25rem 4rem;
+    -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 980px; margin: 0 auto; }
+  .wrap { max-width: 1040px; margin: 0 auto; }
 
+  /* ---------- HEADER ---------- */
   header { margin-bottom: 1.1rem; }
   .header-top {
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 0.8rem;
   }
-  h1 { font-size: 1.55rem; font-weight: 700; }
+  h1 { font-size: 1.2rem; font-weight: 700; color: var(--navy); letter-spacing: -0.01em; }
   h1 .accent { color: var(--red); }
-  .motto {
-    font-family: 'Gochi Hand', cursive; font-size: 1.1rem; color: var(--blue);
-    transform: rotate(-1.5deg); display: inline-block; margin-top: 0.15rem;
-  }
-
+  .motto { font-size: 0.8rem; color: var(--muted); font-style: italic; display: inline-block; margin-top: 0.1rem; }
   .who-bar { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; font-size: 0.82rem; color: var(--muted); }
-  .who-bar .email { font-weight: 600; color: var(--navy); }
+  .who-bar .email { font-weight: 500; color: var(--ink); }
 
-  .tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  /* ---------- TABS ---------- */
+  .tabs { display: flex; gap: 0.15rem; flex-wrap: wrap; border-bottom: 1px solid var(--border-strong); margin-bottom: 1.25rem; }
   .tab {
-    font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.92rem;
-    padding: 0.55rem 1rem; border: 3px solid var(--navy); border-radius: 999px;
-    background: var(--paper); color: var(--navy); cursor: pointer;
-    box-shadow: 3px 3px 0 rgba(22,41,77,0.3);
-    transition: transform 0.1s, box-shadow 0.1s;
+    font-weight: 500; font-size: 0.9rem; color: var(--muted);
+    padding: 0.55rem 0.9rem; border: none; background: none; cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: color 0.12s;
   }
-  .tab:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 rgba(22,41,77,0.4); }
-  .tab.active { background: var(--blue); color: #fff; }
+  .tab:hover { color: var(--navy); }
+  .tab.active { color: var(--navy); font-weight: 600; border-bottom-color: var(--red); }
   .tab .pill {
-    display: inline-block; min-width: 22px; text-align: center;
+    display: inline-block; min-width: 20px; text-align: center;
     background: var(--red); color: #fff; border-radius: 999px;
-    font-size: 0.75rem; padding: 0.05rem 0.4rem; margin-left: 0.3rem;
+    font-size: 0.7rem; font-weight: 600; padding: 0.08rem 0.4rem; margin-left: 0.3rem;
   }
 
+  /* ---------- PANELS ---------- */
   .panel {
-    background: var(--paper); border: 3px solid var(--navy); border-radius: 20px;
-    box-shadow: 7px 8px 0 rgba(22,41,77,0.65); padding: 1.3rem;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    border-top: 3px solid var(--red);
+    box-shadow: 0 1px 3px rgba(22,41,77,0.06);
+    padding: 1.5rem 1.6rem;
     display: none;
-    border-top: 8px solid var(--red);
   }
-  .panel.active { display: block; animation: rise 0.3s ease; }
-  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-
-  .panel h2 { font-size: 1.15rem; margin-bottom: 0.25rem; }
-  .panel .sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 1rem; }
+  .panel.active { display: block; animation: rise 0.18s ease; }
+  @keyframes rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .panel h2 { font-size: 1.05rem; font-weight: 600; color: var(--navy); }
+  .panel .sub { font-size: 0.85rem; color: var(--muted); margin: 0.25rem 0 1.2rem; max-width: 62ch; }
 
   /* ---------- GRADEBOOK GRID ---------- */
-  .grid-scroll { overflow-x: auto; border: 2px solid var(--gold-line); border-radius: 12px; }
+  .grid-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
   table { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 0.88rem; }
-  th, td { padding: 0.45rem 0.5rem; text-align: center; border-bottom: 1px solid var(--gold-line); }
+  th, td { padding: 0.5rem 0.55rem; text-align: center; border-bottom: 1px solid var(--border); }
+  tbody tr:last-child th, tbody tr:last-child td { border-bottom: none; }
   thead th {
-    background: var(--blue-soft); font-weight: 600; font-size: 0.78rem;
-    position: sticky; top: 0; line-height: 1.2; color: var(--navy);
+    background: #f8fafc; font-weight: 600; font-size: 0.74rem; color: var(--navy);
+    position: sticky; top: 0; line-height: 1.3;
   }
-  thead th .topic { display: block; font-weight: 500; color: var(--muted); font-size: 0.68rem; }
+  thead th .topic { display: block; font-weight: 400; color: var(--muted); font-size: 0.7rem; }
   tbody th {
-    text-align: left; font-weight: 600; white-space: nowrap;
-    background: var(--cream); font-size: 0.85rem; padding-left: 0.7rem;
+    text-align: left; font-weight: 500; white-space: nowrap;
+    background: #fbfcfe; font-size: 0.85rem; padding-left: 0.8rem;
   }
   .cell {
-    cursor: pointer; border-radius: 8px; min-width: 62px;
-    user-select: none; transition: background 0.1s; font-weight: 600;
+    cursor: pointer; min-width: 62px; user-select: none; font-weight: 500;
+    transition: box-shadow 0.1s;
   }
-  .cell:hover { outline: 2px dashed var(--blue); outline-offset: -2px; }
-  .cell.done { color: var(--navy); }
-  .cell.missing { background: var(--red-soft); color: var(--red); }
-  .cell.absent { background: #fff3d1; color: #9a7000; }
-  .cell.makeup { background: var(--blue-soft); color: var(--blue); }
-  /* not entered yet — distinct from any status */
-  .cell.empty { color: #c3cbdd; font-weight: 400; }
-  .cell .st { display: block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
-  .legend { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-top: 0.8rem; font-size: 0.78rem; color: var(--muted); }
-  .legend .key { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 4px; vertical-align: -1px; }
-  .hint { font-family: 'Gochi Hand', cursive; color: var(--blue); font-size: 1.05rem; margin-top: 0.7rem; }
+  .cell:hover { box-shadow: inset 0 0 0 2px var(--blue); }
+  .cell.done { color: var(--ink); }
+  .cell.missing { background: var(--tint-missing); color: var(--text-missing); }
+  .cell.absent { background: var(--tint-absent); color: var(--text-absent); }
+  .cell.makeup { background: var(--tint-makeup); color: var(--text-makeup); }
+  .cell.empty { color: #bcc4d4; font-weight: 400; }
+  .cell .st { display: block; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+  .legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.8rem; font-size: 0.78rem; color: var(--muted); }
+  .legend .key { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
 
   /* ---------- OWED LIST ---------- */
-  .owed-group { margin-bottom: 1.1rem; }
-  .owed-group h3 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .owed-group { margin-bottom: 1.2rem; }
+  .owed-group h3 { font-size: 0.9rem; font-weight: 600; color: var(--navy); margin-bottom: 0.5rem; }
   .owed-item {
     display: flex; align-items: center; justify-content: space-between;
-    gap: 0.6rem; padding: 0.6rem 0.8rem; border: 2px solid var(--gold-line);
-    border-radius: 12px; margin-bottom: 0.45rem; background: var(--cream);
-    font-size: 0.9rem;
+    gap: 0.6rem; padding: 0.55rem 0.8rem; border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 0.4rem; background: #fbfcfe;
+    font-size: 0.88rem;
   }
   .owed-item .who { font-weight: 600; }
   .owed-item .what { color: var(--muted); font-size: 0.82rem; }
   .tag {
-    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.05em; padding: 0.2rem 0.55rem; border-radius: 999px;
-    background: var(--blue-soft); color: var(--blue);
+    font-size: 0.66rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 0.18rem 0.55rem; border-radius: 999px;
+    background: var(--tint-makeup); color: var(--text-makeup);
   }
-  .tag.missing { background: var(--red-soft); color: var(--red); }
-  .tag.absent { background: #fff3d1; color: #9a7000; }
-  .tag.makeup { background: var(--blue-soft); color: var(--blue); }
-  .all-clear { text-align: center; padding: 1.5rem; color: var(--muted); font-family: 'Gochi Hand', cursive; font-size: 1.3rem; }
+  .tag.missing { background: var(--tint-missing); color: var(--text-missing); }
+  .tag.absent { background: var(--tint-absent); color: var(--text-absent); }
+  .all-clear { text-align: center; padding: 1.6rem; color: var(--muted); font-size: 0.92rem; }
 
   /* ---------- RETEACH ---------- */
-  .topic-row { margin-bottom: 1rem; }
-  .topic-head { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
-  .topic-head .avg { font-weight: 700; }
-  .bar-track { height: 20px; background: var(--blue-soft); border: 2px solid var(--navy); border-radius: 999px; overflow: hidden; }
-  .bar { height: 100%; border-radius: 999px; transition: width 0.6s cubic-bezier(.5,1.4,.4,1); }
+  .topic-row { margin-bottom: 1.1rem; }
+  .topic-head { display: flex; justify-content: space-between; font-size: 0.88rem; font-weight: 500; margin-bottom: 0.35rem; }
+  .topic-head .avg { font-weight: 600; color: var(--navy); }
+  .bar-track { height: 8px; background: #e9edf4; border-radius: 999px; overflow: hidden; }
+  .bar { height: 100%; border-radius: 999px; transition: width 0.5s ease; }
   .bar.good { background: var(--blue); }
-  .bar.warn { background: #e8a13d; }
+  .bar.warn { background: #d99a2b; }
   .bar.bad  { background: var(--red); }
-  .flag { font-family: 'Gochi Hand', cursive; color: var(--red); font-size: 1rem; margin-top: 0.15rem; }
+  .flag { color: var(--red); font-size: 0.78rem; font-weight: 500; margin-top: 0.3rem; }
 
   /* ---------- EXPORT ---------- */
   .export-box { text-align: center; padding: 1rem 0.5rem; }
+  .export-note { font-size: 0.84rem; color: var(--muted); margin-top: 1rem; line-height: 1.55; max-width: 520px; margin-left: auto; margin-right: auto; text-align: left; }
+
+  /* ---------- BUTTONS ---------- */
   .big-btn {
-    font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1rem;
-    color: #fff; background: var(--red); border: 3px solid var(--navy);
-    border-radius: 14px; padding: 0.8rem 1.6rem; cursor: pointer;
-    box-shadow: 5px 5px 0 rgba(22,41,77,0.75); transition: transform 0.12s;
+    font-weight: 600; font-size: 0.9rem; color: #fff; background: var(--red);
+    border: none; border-radius: 8px; padding: 0.65rem 1.3rem; cursor: pointer;
+    box-shadow: 0 1px 2px rgba(22,41,77,0.15); transition: background 0.12s;
   }
-  .big-btn:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 rgba(22,41,77,0.75); }
-  .big-btn:disabled { opacity: 0.55; cursor: default; transform: none; }
-  .export-note { font-size: 0.85rem; color: var(--muted); margin-top: 0.9rem; line-height: 1.5; max-width: 520px; margin-left: auto; margin-right: auto; }
+  .big-btn:hover { background: var(--red-dark); }
+  .big-btn:disabled { opacity: 0.5; cursor: default; }
+  .mini-btn {
+    font-weight: 500; font-size: 0.84rem; padding: 0.5rem 0.95rem;
+    border: 1px solid var(--border-strong); border-radius: 8px; cursor: pointer;
+    background: #fff; color: var(--ink); transition: background 0.12s, border-color 0.12s;
+  }
+  .mini-btn:hover { border-color: var(--navy); }
+  .mini-btn.save { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .mini-btn.save:hover { background: #1e3560; }
+  .mini-btn.danger { color: var(--red); border-color: #eecdd3; }
+  .mini-btn.danger:hover { border-color: var(--red); }
+  .linklike { background: none; border: none; color: var(--blue); cursor: pointer; font-size: inherit; padding: 0; text-decoration: underline; }
+
+  /* ---------- FORMS ---------- */
+  .txt, .pick, .say {
+    font-size: 0.9rem; padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border-strong); border-radius: 8px;
+    background: #fff; color: var(--ink);
+  }
+  .txt:focus, .pick:focus, .say:focus, .score-line input:focus {
+    outline: 2px solid rgba(36,85,164,0.18); border-color: var(--blue);
+  }
+  .say { width: 100%; resize: vertical; margin-bottom: 0.7rem; }
+  .say::placeholder, .txt::placeholder { color: #9aa4b8; }
 
   /* ---------- VOICE ---------- */
   .voice-row { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
-  select.pick, input.txt {
-    font-family: 'Fredoka', sans-serif; font-size: 0.92rem; font-weight: 600;
-    padding: 0.45rem 0.7rem; border: 2px solid var(--navy); border-radius: 10px;
-    background: #fff; color: var(--navy);
-  }
-  input.txt { font-weight: 500; }
   .mic-btn {
-    font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.95rem;
-    color: #fff; background: var(--red); border: 3px solid var(--navy);
-    border-radius: 999px; padding: 0.6rem 1.3rem; cursor: pointer;
-    box-shadow: 4px 4px 0 rgba(22,41,77,0.6); transition: transform 0.1s;
+    font-weight: 500; font-size: 0.86rem; color: var(--ink);
+    background: #fff; border: 1px solid var(--border-strong); border-radius: 8px;
+    padding: 0.55rem 1rem; cursor: pointer; transition: border-color 0.12s;
   }
-  .mic-btn:hover { transform: translate(-1px,-1px); }
-  .mic-btn.listening { background: var(--blue); animation: pulse 1.2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{box-shadow:4px 4px 0 rgba(22,41,77,0.6),0 0 0 0 rgba(36,85,164,0.4);} 50%{box-shadow:4px 4px 0 rgba(22,41,77,0.6),0 0 0 12px rgba(36,85,164,0);} }
-  .mic-status { color: var(--muted); font-family: 'Gochi Hand', cursive; font-size: 1.05rem; }
-  textarea.say {
-    width: 100%; font-family: 'Fredoka', sans-serif; font-size: 1rem;
-    padding: 0.7rem 0.85rem; border: 2px solid var(--navy); border-radius: 12px;
-    resize: vertical; margin-bottom: 0.7rem; color: var(--navy);
-  }
-  textarea.say::placeholder { color: #a4aec6; }
+  .mic-btn::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--red); margin-right: 0.5rem; vertical-align: 1px; }
+  .mic-btn:hover { border-color: var(--navy); }
+  .mic-btn.listening { background: var(--red); border-color: var(--red); color: #fff; }
+  .mic-btn.listening::before { background: #fff; animation: blink 1.1s ease-in-out infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .mic-status { font-size: 0.82rem; color: var(--muted); }
   .review-item {
     display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
-    padding: 0.55rem 0.8rem; border: 2px solid var(--gold-line); border-radius: 12px;
-    margin-bottom: 0.4rem; background: var(--cream); font-size: 0.92rem;
+    padding: 0.55rem 0.8rem; border: 1px solid var(--border); border-radius: 8px;
+    margin-bottom: 0.4rem; background: #fbfcfe; font-size: 0.9rem;
   }
-  .review-item.bad { border-color: var(--red); background: var(--red-soft); }
+  .review-item.bad { border-color: #eecdd3; background: #fdf5f6; }
   .review-item .parsed { font-weight: 600; }
-  .review-item .heard { color: var(--muted); font-size: 0.78rem; }
+  .review-item .heard { color: var(--muted); font-size: 0.76rem; }
   .review-item .drop {
-    background: none; border: none; color: var(--red); font-weight: 700;
-    cursor: pointer; font-size: 1rem; font-family: 'Fredoka', sans-serif;
+    background: none; border: none; color: var(--muted); font-weight: 600;
+    cursor: pointer; font-size: 0.95rem;
   }
-  .apply-row { margin-top: 0.8rem; text-align: right; }
+  .review-item .drop:hover { color: var(--red); }
+  .apply-row { margin-top: 0.9rem; text-align: right; }
 
-  /* ---------- ROSTER / SETUP ---------- */
-  .setup-block { border: 2px solid var(--gold-line); border-radius: 14px; padding: 1rem; margin-bottom: 1.1rem; background: var(--cream); }
-  .setup-block h3 { font-size: 0.98rem; margin-bottom: 0.2rem; }
-  .setup-block .note { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.7rem; line-height: 1.45; }
-  .chip-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.7rem; }
+  /* ---------- CLASS SETUP ---------- */
+  .setup-block { border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.2rem; margin-bottom: 1rem; background: #fbfcfe; }
+  .setup-block h3 { font-size: 0.94rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem; }
+  .setup-block .note { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.7rem; line-height: 1.5; }
+  .chip-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
   .chip {
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    background: #fff; border: 2px solid var(--navy); border-radius: 999px;
-    padding: 0.3rem 0.65rem; font-size: 0.85rem; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: #fff; border: 1px solid var(--border-strong); border-radius: 999px;
+    padding: 0.28rem 0.7rem; font-size: 0.84rem; font-weight: 500;
   }
-  .chip .x { color: var(--red); cursor: pointer; font-weight: 700; }
-  .chip .sub2 { color: var(--muted); font-weight: 500; font-size: 0.75rem; }
+  .chip .x { color: var(--muted); cursor: pointer; font-weight: 600; }
+  .chip .x:hover { color: var(--red); }
+  .chip .sub2 { color: var(--muted); font-weight: 400; font-size: 0.74rem; }
   .row-form { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
-  .empty-note { color: var(--muted); font-family: 'Gochi Hand', cursive; font-size: 1.1rem; padding: 0.4rem 0; }
+  .empty-note { color: var(--muted); font-size: 0.85rem; padding: 0.3rem 0; }
 
-  /* ---------- AUTH / SETUP SCREENS ---------- */
-  .gate { max-width: 470px; margin: 3rem auto; }
+  /* ---------- GATE SCREENS ---------- */
+  .gate { max-width: 460px; margin: 3.5rem auto 0; }
   .gate .panel { display: block; }
-  .gate p { font-size: 0.9rem; color: var(--muted); line-height: 1.55; margin-bottom: 1rem; }
-  .gate input.txt { width: 100%; margin-bottom: 0.8rem; font-size: 1rem; padding: 0.7rem 0.85rem; }
-  .msg { font-family: 'Gochi Hand', cursive; font-size: 1.1rem; margin-top: 0.9rem; }
+  .gate p { font-size: 0.88rem; color: var(--muted); line-height: 1.55; margin-bottom: 1rem; }
+  .gate input.txt { width: 100%; margin-bottom: 0.8rem; font-size: 0.95rem; padding: 0.65rem 0.8rem; }
+  .msg { font-size: 0.86rem; margin-top: 0.9rem; }
   .msg.ok { color: var(--blue); }
   .msg.err { color: var(--red); }
   .toast {
     position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
-    background: var(--navy); color: #fff; padding: 0.7rem 1.2rem;
-    border-radius: 999px; font-size: 0.9rem; font-weight: 600; z-index: 40;
-    box-shadow: 4px 4px 0 rgba(22,41,77,0.4); display: none;
+    background: var(--navy); color: #fff; padding: 0.65rem 1.2rem;
+    border-radius: 8px; font-size: 0.86rem; font-weight: 500; z-index: 40;
+    box-shadow: 0 4px 14px rgba(22,41,77,0.3); display: none;
   }
-  .toast.show { display: block; animation: rise 0.25s ease; }
+  .toast.show { display: block; animation: rise 0.2s ease; }
   .toast.err { background: var(--red); }
 
-  /* editor modal */
+  /* ---------- EDITOR MODAL ---------- */
   .editor {
-    position: fixed; inset: 0; background: rgba(22,41,77,0.5);
+    position: fixed; inset: 0; background: rgba(22,41,77,0.45);
     display: none; align-items: center; justify-content: center; z-index: 10;
   }
   .editor.open { display: flex; }
   .editor-card {
-    background: #fff; border: 4px solid var(--navy); border-radius: 20px;
-    box-shadow: 8px 9px 0 rgba(22,41,77,0.75); padding: 1.4rem 1.5rem;
-    width: min(92vw, 360px); animation: rise 0.2s ease;
-    border-top: 10px solid var(--red);
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    border-top: 3px solid var(--red);
+    box-shadow: 0 12px 36px rgba(22,41,77,0.22); padding: 1.4rem 1.5rem;
+    width: min(92vw, 360px); animation: rise 0.15s ease;
   }
-  .editor-card h3 { font-size: 1.05rem; margin-bottom: 0.15rem; }
-  .editor-card .ctx { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.9rem; }
+  .editor-card h3 { font-size: 1rem; font-weight: 600; color: var(--navy); margin-bottom: 0.1rem; }
+  .editor-card .ctx { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.9rem; }
   .status-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.9rem; }
   .status-btn {
-    font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.85rem;
-    padding: 0.55rem 0.4rem; border: 2px solid var(--navy); border-radius: 10px;
-    cursor: pointer; background: var(--cream); color: var(--navy);
+    font-weight: 500; font-size: 0.85rem; padding: 0.55rem 0.4rem;
+    border: 1px solid var(--border-strong); border-radius: 8px;
+    cursor: pointer; background: #fff; color: var(--ink);
   }
-  .status-btn.sel { outline: 3px solid var(--red); }
+  .status-btn.sel { background: var(--navy); border-color: var(--navy); color: #fff; font-weight: 600; }
   .score-line { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; }
-  .score-line label { font-size: 0.88rem; font-weight: 600; }
+  .score-line label { font-size: 0.86rem; font-weight: 500; }
   .score-line input {
-    font-family: 'Fredoka', sans-serif; font-size: 1.05rem; font-weight: 600;
-    width: 90px; padding: 0.45rem 0.6rem; border: 2px solid var(--navy); border-radius: 10px;
+    font-size: 1rem; font-weight: 600; width: 90px; padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border-strong); border-radius: 8px;
   }
   .score-line.off { opacity: 0.4; }
   .editor-actions { display: flex; justify-content: flex-end; gap: 0.6rem; }
-  .mini-btn {
-    font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.85rem;
-    padding: 0.5rem 1rem; border: 2px solid var(--navy); border-radius: 10px; cursor: pointer;
-  }
-  .mini-btn.save { background: var(--blue); color: #fff; }
-  .mini-btn.cancel { background: #fff; color: var(--navy); }
-  .mini-btn.danger { background: #fff; color: var(--red); border-color: var(--red); }
 
   @media (max-width: 560px) {
-    h1 { font-size: 1.25rem; }
-    .panel { padding: 1rem 0.8rem; }
+    body { padding: 1rem 0.75rem 3rem; }
+    .panel { padding: 1.1rem 0.9rem; }
+    .tab { padding: 0.5rem 0.6rem; font-size: 0.84rem; }
   }
 </style>
 </head>
@@ -271,15 +280,15 @@
 <!-- ============ SIGN IN ============ -->
 <div class="gate" id="authScreen" style="display:none">
   <div class="panel">
-    <h1 style="margin-bottom:0.3rem">🐎 Mrs. Hinshaw's <span class="accent">Mustang Tracker</span></h1>
+    <h1 style="margin-bottom:0.2rem">Mrs. Hinshaw's <span class="accent">Mustang Tracker</span></h1>
     <span class="motto">"It's a great day to be a Mustang!"</span>
     <p style="margin-top:1rem">
-      Sign in with your email. We'll send a magic link — no password to remember,
-      ever. Your grades are saved to your account, so a new iPad or a cleared
-      browser can't lose them.
+      Sign in with your email and we'll send you a secure sign-in link — no
+      password to remember. Your gradebook is saved to your account, so a new
+      iPad or a cleared browser can't lose it.
     </p>
     <input class="txt" type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
-    <button class="big-btn" id="authBtn">✉️ Email me a magic link</button>
+    <button class="big-btn" id="authBtn">Email me a sign-in link</button>
     <div class="msg" id="authMsg"></div>
   </div>
 </div>
@@ -287,19 +296,20 @@
 <!-- ============ FIRST-RUN SETUP ============ -->
 <div class="gate" id="setupScreen" style="display:none">
   <div class="panel">
-    <h2>Let's set up your first class 🐎</h2>
-    <div class="sub">You don't have any classes yet. Start one from scratch, or load the demo class to poke around first.</div>
-    <div class="row-form" style="margin-bottom:0.9rem">
+    <h2>Set up your first class</h2>
+    <div class="sub">Name a class period to get started. You'll add students and assignments on the next screen — it takes about two minutes.</div>
+    <label for="newClassName" style="display:block;font-size:0.82rem;font-weight:600;color:var(--navy);margin-bottom:0.35rem">Class name</label>
+    <div class="row-form" style="margin-bottom:1.1rem">
       <input class="txt" id="newClassName" placeholder="2nd Period — Pre-Algebra" style="flex:1;min-width:200px">
-      <button class="mini-btn save" id="createClassBtn">Create class</button>
+      <button class="big-btn" id="createClassBtn">Create class</button>
     </div>
     <div class="setup-block" style="margin-bottom:0">
-      <h3>Just want to look around?</h3>
+      <h3>Prefer to explore first?</h3>
       <div class="note">
-        Loads a full pretend class — 10 made-up students, 8 assignments, a term of
-        grades. Nothing real, and you can delete it whenever.
+        Load a sample class — 10 fictional students, 8 assignments, a term of
+        grades. Nothing real; delete it whenever you like.
       </div>
-      <button class="big-btn" id="demoBtn">🎒 Load the demo class</button>
+      <button class="mini-btn" id="demoBtn">Load the sample class</button>
     </div>
     <div class="msg" id="setupMsg"></div>
     <div class="who-bar" style="margin-top:1rem">
@@ -314,7 +324,7 @@
   <header>
     <div class="header-top">
       <div>
-        <h1>🐎 Mrs. Hinshaw's <span class="accent">Mustang Tracker</span></h1>
+        <h1>Mrs. Hinshaw's <span class="accent">Mustang Tracker</span></h1>
         <span class="motto">"It's a great day to be a Mustang!"</span>
       </div>
       <div class="who-bar">
@@ -326,41 +336,40 @@
   </header>
 
   <div class="tabs">
-    <button class="tab active" data-panel="gradebook">✏️ Gradebook</button>
-    <button class="tab" data-panel="voice">🎤 Speak Grades</button>
-    <button class="tab" data-panel="owed">📋 Who Owes What <span class="pill" id="owedCount">0</span></button>
-    <button class="tab" data-panel="reteach">🔄 Re-teach Radar</button>
-    <button class="tab" data-panel="roster">🎒 Class Setup</button>
-    <button class="tab" data-panel="export">📤 Send to FACTS</button>
+    <button class="tab active" data-panel="gradebook">Gradebook</button>
+    <button class="tab" data-panel="voice">Speak Grades</button>
+    <button class="tab" data-panel="owed">Who Owes What <span class="pill" id="owedCount">0</span></button>
+    <button class="tab" data-panel="reteach">Re-teach Radar</button>
+    <button class="tab" data-panel="roster">Class Setup</button>
+    <button class="tab" data-panel="export">Send to FACTS</button>
   </div>
 
   <section class="panel active" id="gradebook">
     <h2 id="gbTitle">Gradebook</h2>
-    <div class="sub">Tap any cell to set a score or mark missing / absent / makeup. Topic tags on each assignment feed the Re-teach Radar automatically. Every change saves to your account immediately.</div>
+    <div class="sub">Tap any cell to set a score or mark it missing, absent, or makeup. Every change saves to your account immediately, and the other tabs update from this grid on their own.</div>
     <div class="grid-scroll"><table id="gridTable"></table></div>
     <div class="legend" id="legend"></div>
-    <div class="hint">↑ the whole app in one glance — everything else is generated from this grid</div>
   </section>
 
   <section class="panel" id="voice">
     <h2>Speak Grades</h2>
-    <div class="sub">Pick the assignment, then talk: <em>"Marcus 78, Kayla absent, Josh missing, Emma 92."</em> Review what it heard, then apply. On iPad you can also tap the text box and use the keyboard's 🎙 dictation button — that always works.</div>
+    <div class="sub">Pick the assignment, then speak: <em>"Marcus 78, Kayla absent, Josh missing, Emma 92."</em> Review what it heard before anything is written. On iPad you can also tap the text box and use the keyboard's dictation key — that always works.</div>
 
     <div class="voice-row">
-      <label for="voiceAsg" style="font-weight:600;font-size:0.9rem;">Assignment:</label>
+      <label for="voiceAsg" style="font-weight:500;font-size:0.88rem;">Assignment</label>
       <select class="pick" id="voiceAsg"></select>
     </div>
 
     <div class="voice-row">
-      <button class="mic-btn" id="micBtn">🎤 Start listening</button>
+      <button class="mic-btn" id="micBtn">Start listening</button>
       <span class="mic-status" id="micStatus"></span>
     </div>
 
-    <textarea class="say" id="voiceText" rows="3" placeholder="…or tap here and use the iPad keyboard's 🎙 dictation — e.g. Marcus 78, Kayla absent, Josh missing, Emma 92"></textarea>
+    <textarea class="say" id="voiceText" rows="3" placeholder="…or tap here and use the iPad keyboard's dictation — e.g. Marcus 78, Kayla absent, Josh missing, Emma 92"></textarea>
 
     <div class="voice-row" style="justify-content:flex-end;">
       <button class="mini-btn cancel" id="voiceClear">Clear</button>
-      <button class="mini-btn save" id="voiceReview">Review what I said →</button>
+      <button class="mini-btn save" id="voiceReview">Review what I said</button>
     </div>
 
     <div id="reviewArea"></div>
@@ -381,82 +390,84 @@
   <!-- ---------- CLASS SETUP / ROSTER ---------- -->
   <section class="panel" id="roster">
     <h2>Class Setup</h2>
-    <div class="sub">Your roster and your assignments. Add students by typing, by talking, or by pasting a CSV straight out of FACTS.</div>
+    <div class="sub">Manage this class's roster, assignments, and periods. Changes save immediately.</div>
 
     <div class="setup-block">
       <h3>Students <span class="sub2" id="studentCount"></span></h3>
-      <div class="note">Tap the ✕ on a student to remove them. Removing a student deletes their grades too.</div>
+      <div class="note">Last names are optional — they're only used to tell two students with the same first name apart. Removing a student also removes their grades.</div>
       <div class="chip-list" id="studentChips"></div>
 
-      <div class="row-form" style="margin-bottom:0.8rem">
-        <input class="txt" id="addStudentInput" placeholder="Marcus Davis, Kayla Fields, Josh…" style="flex:1;min-width:220px">
-        <button class="mini-btn save" id="addStudentBtn">+ Add</button>
-      </div>
-      <div class="note" style="margin-bottom:0.8rem">
-        Type one name or several separated by commas. Last name is optional — it's
-        only used to tell two kids with the same first name apart.
+      <div class="row-form" style="margin-bottom:1rem">
+        <input class="txt" id="addStudentInput" placeholder="Add students — e.g. Marcus Davis, Kayla Fields" style="flex:1;min-width:220px">
+        <button class="mini-btn save" id="addStudentBtn">Add</button>
       </div>
 
-      <div class="voice-row">
-        <button class="mic-btn" id="rosterMicBtn">🎤 Speak the roster</button>
-        <span class="mic-status" id="rosterMicStatus"></span>
-      </div>
-      <textarea class="say" id="rosterText" rows="2" placeholder="…or dictate: &quot;Avery Brooks, Marcus Davis, Kayla Fields&quot;"></textarea>
-      <div class="voice-row" style="justify-content:flex-end;">
-        <button class="mini-btn cancel" id="rosterClear">Clear</button>
-        <button class="mini-btn save" id="rosterReview">Review names →</button>
-      </div>
-      <div id="rosterReviewArea"></div>
-
-      <div style="margin-top:0.9rem">
-        <div class="note" style="margin-bottom:0.5rem">
-          <strong>Import a CSV.</strong> One student per line — <code>First,Last</code>
-          or just <code>First</code>. A header row is fine; it'll be skipped.
+      <details style="margin-bottom:0.6rem">
+        <summary style="font-size:0.84rem;font-weight:500;color:var(--blue);cursor:pointer">Add by voice instead</summary>
+        <div style="margin-top:0.7rem">
+          <div class="voice-row">
+            <button class="mic-btn" id="rosterMicBtn">Speak the roster</button>
+            <span class="mic-status" id="rosterMicStatus"></span>
+          </div>
+          <textarea class="say" id="rosterText" rows="2" placeholder="…or dictate: &quot;Avery Brooks, Marcus Davis, Kayla Fields&quot;"></textarea>
+          <div class="voice-row" style="justify-content:flex-end;">
+            <button class="mini-btn cancel" id="rosterClear">Clear</button>
+            <button class="mini-btn save" id="rosterReview">Review names</button>
+          </div>
+          <div id="rosterReviewArea"></div>
         </div>
-        <div class="row-form">
+      </details>
+
+      <details>
+        <summary style="font-size:0.84rem;font-weight:500;color:var(--blue);cursor:pointer">Import from a CSV file</summary>
+        <div style="margin-top:0.7rem">
+          <div class="note" style="margin-bottom:0.5rem">
+            One student per line — <code>First,Last</code>, just <code>First</code>,
+            or a FACTS-style <code>"Last, First"</code> column. A header row is skipped automatically.
+          </div>
           <input type="file" id="csvFile" accept=".csv,text/csv" style="font-size:0.85rem">
         </div>
-      </div>
+      </details>
     </div>
 
     <div class="setup-block">
       <h3>Assignments <span class="sub2" id="asgCount"></span></h3>
-      <div class="note">Each assignment carries a topic. The topic is what the Re-teach Radar groups by, so keep the wording consistent.</div>
+      <div class="note">Each assignment carries a topic — that's what the Re-teach Radar groups by, so keep the wording consistent.</div>
       <div class="chip-list" id="asgChips"></div>
       <div class="row-form">
-        <input class="txt" id="addAsgName" placeholder="Quiz 4.5" style="width:130px">
+        <input class="txt" id="addAsgName" placeholder="Name — e.g. Quiz 4.5" style="width:170px">
         <input class="txt" id="addAsgTopic" placeholder="Topic — e.g. Proportions" list="topicList" style="flex:1;min-width:170px">
         <datalist id="topicList"></datalist>
         <input class="txt" id="addAsgPoints" type="number" value="100" min="1" style="width:80px" title="Points possible">
-        <button class="mini-btn save" id="addAsgBtn">+ Add</button>
+        <button class="mini-btn save" id="addAsgBtn">Add</button>
       </div>
     </div>
 
     <div class="setup-block">
       <h3>Class periods</h3>
-      <div class="note">Add another period and switch between them from the picker up top.</div>
+      <div class="note">Add another period and switch between them with the selector in the header.</div>
       <div class="row-form">
         <input class="txt" id="addClassName" placeholder="4th Period — Algebra I" style="flex:1;min-width:200px">
-        <button class="mini-btn save" id="addClassBtn">+ Add period</button>
+        <button class="mini-btn save" id="addClassBtn">Add period</button>
         <button class="mini-btn danger" id="deleteClassBtn">Delete this class</button>
       </div>
     </div>
 
     <div class="setup-block">
-      <h3>Demo class</h3>
+      <h3>Sample class</h3>
       <div class="note">
-        Adds a fresh pretend class — 10 made-up students, 8 assignments, a term of
-        grades. Handy for showing someone how it works without touching a real
-        roster. Adds a new period; it won't disturb the classes you already have.
+        Adds a separate practice class — 10 fictional students, 8 assignments, a
+        term of grades. Useful for showing someone how the app works without
+        touching a real roster. Your existing classes aren't affected.
       </div>
-      <button class="mini-btn save" id="demoBtn2">🎒 Load a demo class</button>
+      <button class="mini-btn" id="demoBtn2">Load a sample class</button>
     </div>
   </section>
 
   <section class="panel" id="export">
     <h2>Send to FACTS / RenWeb</h2>
     <div class="export-box">
-      <button class="big-btn" id="exportBtn">⬇️ Download grades as CSV</button>
+      <button class="big-btn" id="exportBtn">Download grades (CSV)</button>
       <p class="export-note">
         <strong>Phase 1:</strong> download a CSV shaped for quick entry or import into FACTS — enter once here, transfer in one motion.<br><br>
         <strong>Phase 2 (if the school says yes):</strong> FACTS has an API, but the key has to be turned on by the school's FACTS administrator. If they'll grant one, grades could sync automatically — no double entry at all. That's a conversation with the front office, not a technical blocker.
@@ -553,7 +564,7 @@ $('authBtn').onclick = async () => {
   $('authMsg').className = 'msg ' + (error ? 'err' : 'ok');
   $('authMsg').textContent = error
     ? `Hmm — ${error.message}`
-    : '✉️ Check your email and tap the link. You can close this tab.';
+    : 'Check your email and tap the link. You can close this tab.';
 };
 
 const signOut = async () => { await sb.auth.signOut(); location.reload(); };
@@ -614,8 +625,10 @@ function renderGrid() {
     const what = !state.students.length && !state.assignments.length ? 'students or assignments'
                : !state.students.length ? 'students' : 'assignments';
     table.innerHTML = `<tbody><tr><td style="padding:2rem;text-align:center">
-      <div class="empty-note">no ${what} yet — head to 🎒 Class Setup to add some</div>
+      <div class="empty-note">No ${what} yet. <button class="linklike" id="goSetup">Open Class Setup</button> to add them.</div>
     </td></tr></tbody>`;
+    const go = table.querySelector('#goSetup');
+    if (go) go.onclick = () => activateTab('roster');
     renderOwed(); renderTopics(); renderLegend();
     return;
   }
@@ -653,7 +666,7 @@ function renderGrid() {
 }
 
 function renderLegend() {
-  const colors = { missing: '#fde8ec', absent: '#fff3d1', makeup: '#e7f0fc' };
+  const colors = { missing: '#fbebed', absent: '#fcf4df', makeup: '#e9f0fa' };
   let html = state.statuses.filter(s => s.is_owed)
     .map(s => `<span><span class="key" style="background:${colors[s.code] || '#e7f0fc'}"></span>${esc(s.label)}</span>`)
     .join('');
@@ -678,7 +691,7 @@ function renderOwed() {
   const total = Object.values(groups).reduce((n, g) => n + g.length, 0);
   $('owedCount').textContent = total;
 
-  const titles = { missing: '❌ Missing work', absent: '🏠 Absent — needs the assignment', makeup: '🔄 Makeup pending' };
+  const titles = { missing: 'Missing work', absent: 'Absent — needs the assignment', makeup: 'Makeup pending' };
   let html = '';
   owedStatuses().forEach(st => {
     const g = groups[st.code];
@@ -691,7 +704,7 @@ function renderOwed() {
     });
     html += '</div>';
   });
-  if (!html) html = `<div class="all-clear">nothing owed — the herd is all caught up! 🐎🎉</div>`;
+  if (!html) html = `<div class="all-clear">Nothing owed — everyone is caught up.</div>`;
   $('owedList').innerHTML = html;
 }
 
@@ -710,7 +723,7 @@ function renderTopics() {
 
   const entries = Object.entries(topics);
   if (!entries.length) {
-    $('topicBars').innerHTML = `<div class="empty-note">no graded work yet — the radar lights up once scores go in</div>`;
+    $('topicBars').innerHTML = `<div class="empty-note">No graded work yet — the radar fills in once scores go in.</div>`;
     return;
   }
 
@@ -721,7 +734,7 @@ function renderTopics() {
     html += `<div class="topic-row">
       <div class="topic-head"><span>${esc(topic)}</span><span class="avg">${a}%</span></div>
       <div class="bar-track"><div class="bar ${cls}" style="width:${a}%"></div></div>
-      ${cls === 'bad' ? `<div class="flag">⚠ strong re-teach candidate — class avg under 70</div>` : ''}
+      ${cls === 'bad' ? `<div class="flag">Class average under 70 — strong re-teach candidate</div>` : ''}
     </div>`;
   });
   $('topicBars').innerHTML = html;
@@ -750,10 +763,9 @@ function openEditor(sid, aid) {
   $('scoreInput').max = a.points;
   $('pointsHint').textContent = `/ ${a.points}`;
 
-  const icons = { done: '✅', missing: '❌', absent: '🏠', makeup: '🔄' };
   $('statusRow').innerHTML = state.statuses.map(st =>
     `<button class="status-btn ${st.code === current ? 'sel' : ''}" data-status="${st.code}">
-       ${icons[st.code] || '•'} ${esc(st.label)}
+       ${esc(st.label)}
      </button>`).join('');
 
   $('statusRow').querySelectorAll('.status-btn').forEach(b => {
@@ -815,7 +827,7 @@ function wireMic(btnId, statusId, textId) {
   const btn = $(btnId), status = $(statusId), text = $(textId);
   if (!SR) {
     btn.style.display = 'none';
-    status.textContent = "no browser mic here — use the keyboard's 🎙 dictation in the box below";
+    status.textContent = "No live mic in this browser — use the keyboard's dictation in the box below.";
     return;
   }
   const recog = new SR();
@@ -833,18 +845,18 @@ function wireMic(btnId, statusId, textId) {
     status.textContent = 'listening… talk naturally';
   };
   recog.onend = () => { if (listening) { try { recog.start(); } catch (_) {} } else status.textContent = ''; };
-  recog.onerror = () => { status.textContent = 'mic hiccup — the ⌨️ 🎙 dictation below always works'; };
+  recog.onerror = () => { status.textContent = 'Mic hiccup — the keyboard dictation in the box below always works.'; };
 
   btn.onclick = () => {
     listening = !listening;
     if (listening) {
       try { recog.start(); } catch (_) {}
-      btn.textContent = '⏹ Stop';
+      btn.textContent = 'Stop listening';
       btn.classList.add('listening');
       status.textContent = 'listening… talk naturally';
     } else {
       recog.stop();
-      btn.textContent = btnId === 'micBtn' ? '🎤 Start listening' : '🎤 Speak the roster';
+      btn.textContent = btnId === 'micBtn' ? 'Start listening' : 'Speak the roster';
       btn.classList.remove('listening');
       status.textContent = '';
     }
@@ -860,13 +872,13 @@ let pendingGrades = null;
 function parseVoice() {
   const raw = $('voiceText').value.trim();
   const area = $('reviewArea');
-  if (!raw) { area.innerHTML = `<div class="mic-status">nothing to review yet — speak or dictate first</div>`; return; }
-  if (!state.assignments.length) { area.innerHTML = `<div class="mic-status">add an assignment first (🎒 Class Setup)</div>`; return; }
+  if (!raw) { area.innerHTML = `<div class="mic-status">Nothing to review yet — speak or dictate first.</div>`; return; }
+  if (!state.assignments.length) { area.innerHTML = `<div class="mic-status">Add an assignment first, under Class Setup.</div>`; return; }
 
   pendingGrades = parseGrades(raw, state.students, state.statuses);
 
   if (!pendingGrades.length) {
-    area.innerHTML = `<div class="mic-status">couldn't find any "name + score/status" pairs in that — try "Marcus 78, Kayla absent"</div>`;
+    area.innerHTML = `<div class="mic-status">Couldn't find any name + score pairs in that — try "Marcus 78, Kayla absent".</div>`;
     return;
   }
   renderReview();
@@ -918,7 +930,7 @@ function renderReview() {
 
   html += `<div class="apply-row">
     <button class="big-btn" id="applyBtn" ${applicable ? '' : 'disabled'}>
-      ✅ Apply ${applicable} grade${applicable === 1 ? '' : 's'} to gradebook
+      Apply ${applicable} grade${applicable === 1 ? '' : 's'} to gradebook
     </button></div>`;
   area.innerHTML = html;
 
@@ -961,7 +973,7 @@ async function applyParse() {
   const asgName = state.assignments.find(a => a.id === aid)?.name || '';
   renderGrid();
   $('reviewArea').innerHTML =
-    `<div class="mic-status" style="font-size:1.2rem;color:var(--blue);">✅ applied ${rows.length} grade${rows.length === 1 ? '' : 's'} to ${esc(asgName)} — check the Gradebook tab!</div>`;
+    `<div class="mic-status" style="font-size:0.95rem;color:var(--blue);font-weight:500;">Applied ${rows.length} grade${rows.length === 1 ? '' : 's'} to ${esc(asgName)}. Check the Gradebook tab.</div>`;
   $('voiceText').value = '';
   pendingGrades = null;
 }
@@ -1009,7 +1021,7 @@ $('csvFile').onchange = async e => {
   if (!file) return;
   const text = await file.text();
   const names = parseCsvNames(text);
-  if (!names.length) { toast("couldn't find any names in that CSV", true); return; }
+  if (!names.length) { toast("Couldn't find any names in that CSV", true); return; }
   await addStudents(names);
   e.target.value = '';
 };
@@ -1020,11 +1032,11 @@ let pendingNames = null;
 $('rosterReview').onclick = () => {
   const raw = $('rosterText').value.trim();
   const area = $('rosterReviewArea');
-  if (!raw) { area.innerHTML = `<div class="mic-status">nothing to review yet — speak or dictate first</div>`; return; }
+  if (!raw) { area.innerHTML = `<div class="mic-status">Nothing to review yet — speak or dictate first.</div>`; return; }
 
   const names = parseRosterNames(raw);
 
-  if (!names.length) { area.innerHTML = `<div class="mic-status">didn't catch any names — try "Avery Brooks, Marcus Davis"</div>`; return; }
+  if (!names.length) { area.innerHTML = `<div class="mic-status">Didn't catch any names — try "Avery Brooks, Marcus Davis".</div>`; return; }
 
   pendingNames = names.map(n => ({ name: n, dup: state.students.some(s => s.display_name.toLowerCase().startsWith(n.split(' ')[0].toLowerCase())) }));
 
@@ -1036,7 +1048,7 @@ $('rosterReview').onclick = () => {
       </div>
       <button class="drop" data-drop="${i}">✕</button></div>`;
   });
-  html += `<div class="apply-row"><button class="big-btn" id="applyNamesBtn">✅ Add to roster</button></div>`;
+  html += `<div class="apply-row"><button class="big-btn" id="applyNamesBtn">Add to roster</button></div>`;
   area.innerHTML = html;
 
   area.querySelectorAll('[data-drop]').forEach(b => {
@@ -1050,7 +1062,7 @@ $('rosterReview').onclick = () => {
     const n = await addStudents(keep);
     if (n) {
       $('rosterText').value = '';
-      area.innerHTML = `<div class="mic-status" style="color:var(--blue)">✅ added ${n} to the roster</div>`;
+      area.innerHTML = `<div class="mic-status" style="color:var(--blue)">Added ${n} to the roster.</div>`;
       pendingNames = null;
     }
   };
@@ -1120,13 +1132,13 @@ function renderRoster() {
   $('studentChips').innerHTML = state.students.length
     ? state.students.map(s => `<span class="chip">${esc(s.display_name)}
         <span class="x" data-rm-student="${s.id}">✕</span></span>`).join('')
-    : `<div class="empty-note">no students yet — add them below</div>`;
+    : `<div class="empty-note">No students yet — add them below.</div>`;
 
   $('asgChips').innerHTML = state.assignments.length
     ? state.assignments.map(a => `<span class="chip">${esc(a.name)}
         <span class="sub2">${esc(a.topic)}</span>
         <span class="x" data-rm-asg="${a.id}">✕</span></span>`).join('')
-    : `<div class="empty-note">no assignments yet — add one below</div>`;
+    : `<div class="empty-note">No assignments yet — add one below.</div>`;
 
   $('studentChips').querySelectorAll('[data-rm-student]').forEach(b => {
     b.onclick = () => removeStudent(b.dataset.rmStudent);
@@ -1298,19 +1310,23 @@ async function loadDemoClass() {
   showApp();
   done();
   $('setupMsg').textContent = '';
-  toast('demo class loaded 🐎');
+  toast('Sample class loaded');
 }
 $('demoBtn').onclick = loadDemoClass;
 $('demoBtn2').onclick = loadDemoClass;
 
 $('createClassBtn').onclick = async () => {
   const name = $('newClassName').value.trim();
-  if (!name) { $('setupMsg').className = 'msg err'; $('setupMsg').textContent = 'give the class a name first'; return; }
+  if (!name) { $('setupMsg').className = 'msg err'; $('setupMsg').textContent = 'Give the class a name first.'; return; }
   const c = await createClass(name);
   if (!c) return;
   await loadClasses();
   await switchClass(c.id);
   showApp();
+  // A brand-new class is empty; drop her straight into Class Setup so the
+  // next step (add students) is in front of her, not behind another tab.
+  activateTab('roster');
+  toast(`${name} created — add your students below`);
 };
 
 /* =====================================================================
@@ -1334,13 +1350,12 @@ const showAuth = () => show('authScreen');
 const showSetup = () => { $('setupEmail').textContent = state.user?.email || ''; show('setupScreen'); };
 const showApp = () => { $('userEmail').textContent = state.user?.email || ''; show('app'); };
 
+function activateTab(id) {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.panel === id));
+  document.querySelectorAll('.panel').forEach(x => x.classList.toggle('active', x.id === id));
+}
 document.querySelectorAll('.tab').forEach(t => {
-  t.onclick = () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    $(t.dataset.panel).classList.add('active');
-  };
+  t.onclick = () => activateTab(t.dataset.panel);
 });
 
 wireMic('micBtn', 'micStatus', 'voiceText');

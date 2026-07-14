@@ -96,10 +96,19 @@ Student names + grades = sensitive. Supabase row-level security on;
 no analytics; no student data in logs or commits. Seed/demo data in
 this repo is fictional and should stay that way.
 
-## Design language
-Mustang red (#c8102e), navy (#16294d), bright blue (#2455a4), white.
-Playful but not childish: chunky borders, offset shadows, Fredoka +
-Gochi Hand. Red top-stripe on panels. Keep the motto in the header.
+## Design language (revised 2026-07 — Toby's call, supersedes the mockup)
+PROFESSIONAL, not playful. Toby's words: "she teaches middle school, but
+she is in fact an adult." The original cartoon look (Fredoka + Gochi
+Hand, chunky borders, offset shadows, emoji in tabs/buttons) is retired
+— do not bring it back when copying from the old mockup.
+
+Current system: Inter throughout; flat light background (#f4f6f9);
+white cards with 1px #e2e7f0 borders and a 3px Mustang-red top accent;
+underline-style tabs; navy (#16294d) for headings/primary buttons, red
+(#c8102e) reserved for the brand accent and the main call-to-action.
+Status tints stay soft (red/amber/blue) with small-caps labels. The
+motto stays in the header, small and italic. Emoji only where it names
+a real key (none currently); ✕ close buttons are fine.
 
 ## Build order
 1. ~~Deploy mockup to GitHub Pages~~ — DONE. thinshaw.github.io/mustang-tracker
