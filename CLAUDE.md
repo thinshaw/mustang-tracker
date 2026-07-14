@@ -90,12 +90,37 @@ Playful but not childish: chunky borders, offset shadows, Fredoka +
 Gochi Hand. Red top-stripe on panels. Keep the motto in the header.
 
 ## Build order
-1. Deploy mockup as-is to GitHub Pages so Traci can play with it (done
-   or in progress — check).
-2. Supabase schema + wire the grid to it (replace in-memory `cells`).
-3. Auth (magic link) + period switcher.
-4. Roster management screen (add/edit students, assignments, topics).
-5. PWA polish (manifest, icons, Add to Home Screen).
-6. Voice parser v2 via Anthropic API.
+1. ~~Deploy mockup to GitHub Pages~~ — DONE. thinshaw.github.io/mustang-tracker
+2. ~~Supabase schema + wire the grid to it~~ — DONE. Project ref
+   `habffloatnxdcqooture`. Migrations in `supabase/migrations/`.
+3. ~~Auth (magic link) + period switcher~~ — DONE.
+4. ~~Roster management~~ — DONE (Class Setup tab): students by typing,
+   voice, or CSV import; assignments + topics; add/delete periods.
+5. ~~PWA polish~~ — DONE (manifest + icons + Add to Home Screen meta).
+6. Voice parser v2 via Anthropic API. NOT STARTED. The regex parser in
+   `lib.js` handles digits, spoken numbers, status synonyms and
+   first-name collisions; it does NOT handle "everyone got 100 except
+   Josh". Keep review-before-apply when this lands.
 7. FACTS: CSV shape validation with a real export from her gradebook,
-   then API conversation with the school.
+   then API conversation with the school. NOT STARTED — needs a real
+   FACTS export to validate against, and a key from the front office.
+
+## Statuses — STILL OPEN with Traci
+Nothing is blocked on this. The `statuses` table + the `is_owed` /
+`expects_score` flags mean adding "late" or "excused" is one INSERT,
+no migration and no code change. Best asked when she's holding the
+app, not in the abstract.
+
+## Testing
+`node --test 'test/*.test.mjs'` — pure logic in `lib.js`. The app imports
+those exact functions, so the tests cover what ships. The live mic (Web
+Speech API) is NOT covered — it can't run headless. The textarea path
+(iPad keyboard dictation) is the guaranteed one and IS covered.
+
+## Keys
+- anon key: in `config.js`, public by design, safe in the repo. RLS is
+  what protects the data.
+- service_role key: NEVER in the repo, never in the browser. It bypasses
+  RLS completely.
+- DB password: Toby's, in his password manager. Not needed for anything
+  here — the CLI uses its own token.
