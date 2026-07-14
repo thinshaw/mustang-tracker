@@ -1,7 +1,7 @@
 # Mustang Tracker — CLAUDE.md
 
 ## What this is
-A class tracker for Traci Hinshaw ("Mrs. H"), junior high math teacher at
+A class tracker for Traci Hinshaw ("Mrs. Hinshaw" — she does NOT go by "Mrs. H"), junior high math teacher at
 Fellowship Academy in Kennedale, TX (private Christian school, PK-12,
 Mustangs, red & blue, motto: "It's a great day to be a Mustang!").
 Built by her husband Toby. The mockup in `index.html` has been shown to her;

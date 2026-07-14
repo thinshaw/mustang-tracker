@@ -1,6 +1,6 @@
 # Mustang Tracker
 
-A class tracker for **Mrs. H** — junior high math at Fellowship Academy.
+A class tracker for **Mrs. Hinshaw** — junior high math at Fellowship Academy.
 *It's a great day to be a Mustang!*
 
 **Live:** https://thinshaw.github.io/mustang-tracker/

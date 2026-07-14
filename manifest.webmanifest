@@ -1,7 +1,7 @@
 {
-  "name": "Mrs. H's Mustang Tracker",
+  "name": "Mrs. Hinshaw's Mustang Tracker",
   "short_name": "Mustangs",
-  "description": "Gradebook, missing work, and re-teach radar for Mrs. H's math classes.",
+  "description": "Gradebook, missing work, and re-teach radar for Mrs. Hinshaw's math classes.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
