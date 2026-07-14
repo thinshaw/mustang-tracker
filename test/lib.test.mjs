@@ -155,6 +155,78 @@ test('nameToken strips scores and filler', () => {
 
 /* ------------------------------------------------------- the whole parse --- */
 
+/* Speech recognition returns NO punctuation. These are the cases that matter
+   most, because they are what the live mic actually produces. */
+
+test('parseGrades: DICTATED with no punctuation at all', () => {
+  const out = parseGrades('Marcus 88 Kayla absent Josh missing Emma 39', ROSTER, STATUSES);
+  assert.equal(out.length, 4, 'must find all four, not just the first');
+  assert.deepEqual(out.map(p => [p.student?.first_name, p.status, p.score]), [
+    ['Marcus', 'done', 88],
+    ['Kayla', 'absent', null],
+    ['Josh', 'missing', null],
+    ['Emma', 'done', 39],
+  ]);
+});
+
+test('parseGrades: dictated and typed produce identical results', () => {
+  const dictated = parseGrades('Marcus 88 Kayla absent Josh missing Emma 39', ROSTER, STATUSES);
+  const typed = parseGrades('Marcus 88, Kayla absent, Josh missing, Emma 39', ROSTER, STATUSES);
+  const shape = o => o.map(p => [p.student?.id, p.status, p.score, p.ok]);
+  assert.deepEqual(shape(dictated), shape(typed));
+});
+
+test('parseGrades: a score must never leak onto the next student', () => {
+  // The old parser collapsed this into one row and put "missing" on Marcus,
+  // wiping his 88. That is the bug this whole rewrite exists to prevent.
+  const out = parseGrades('Marcus 88 Kayla absent', ROSTER, STATUSES);
+  assert.equal(out[0].student.first_name, 'Marcus');
+  assert.equal(out[0].score, 88);
+  assert.equal(out[0].status, 'done');
+  assert.equal(out[1].student.first_name, 'Kayla');
+  assert.equal(out[1].status, 'absent');
+  assert.equal(out[1].score, null);
+});
+
+test('parseGrades: dictated spoken numbers and filler words', () => {
+  const out = parseGrades('Marcus got a seventy eight Emma one hundred', ROSTER, STATUSES);
+  assert.deepEqual(out.map(p => [p.student.first_name, p.score]), [['Marcus', 78], ['Emma', 100]]);
+});
+
+test('parseGrades: dictated, an unknown name is still flagged not swallowed', () => {
+  const out = parseGrades('Marcus 88 Bartholomew 50', ROSTER, STATUSES);
+  assert.equal(out[0].ok, true);
+  assert.equal(out[0].score, 88, "Marcus keeps his own score");
+  assert.equal(out[1].ok, false);
+  assert.equal(out[1].reason, 'no-student');
+});
+
+test('parseGrades: dictated, a collision still refuses to guess', () => {
+  const twoJoshes = [...ROSTER, { id: 's5', first_name: 'Josh', last_name: 'Pike' }];
+  const out = parseGrades('Josh 90 Emma 70', twoJoshes, STATUSES);
+  assert.equal(out[0].ok, false);
+  assert.equal(out[0].reason, 'ambiguous');
+  assert.equal(out[1].student.first_name, 'Emma');
+});
+
+test('parseGrades: dictated, last initial disambiguates mid-stream', () => {
+  const twoJoshes = [...ROSTER, { id: 's5', first_name: 'Josh', last_name: 'Pike' }];
+  const out = parseGrades('Josh G 90 Josh P 70', twoJoshes, STATUSES);
+  assert.deepEqual(out.map(p => [p.student.id, p.score]), [['s3', 90], ['s5', 70]]);
+});
+
+test('parseGrades: a name with no score or status is flagged, not defaulted', () => {
+  const out = parseGrades('Marcus', ROSTER, STATUSES);
+  assert.equal(out[0].ok, false);
+  assert.equal(out[0].reason, 'no-value');
+});
+
+test('parseGrades: trailing voice noise is ignored', () => {
+  const out = parseGrades('Marcus 88 Kayla absent apply that', ROSTER, STATUSES);
+  assert.equal(out.length, 2);
+  assert.equal(out.every(p => p.ok), true);
+});
+
 test('parseGrades handles the canonical utterance', () => {
   const out = parseGrades('Marcus 78, Kayla absent, Josh missing, Emma 92', ROSTER, STATUSES);
   assert.equal(out.length, 4);

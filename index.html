@@ -863,103 +863,84 @@ function parseVoice() {
   if (!raw) { area.innerHTML = `<div class="mic-status">nothing to review yet — speak or dictate first</div>`; return; }
   if (!state.assignments.length) { area.innerHTML = `<div class="mic-status">add an assignment first (🎒 Class Setup)</div>`; return; }
 
-  const parsed = parseGrades(raw, state.students, state.statuses);
+  pendingGrades = parseGrades(raw, state.students, state.statuses);
 
-  if (!parsed.length) {
+  if (!pendingGrades.length) {
     area.innerHTML = `<div class="mic-status">couldn't find any "name + score/status" pairs in that — try "Marcus 78, Kayla absent"</div>`;
     return;
   }
-
-  pendingGrades = parsed;
-  const asgName = state.assignments.find(a => a.id === $('voiceAsg').value)?.name || '';
-  let html = `<h3 style="font-size:0.95rem;margin:0.6rem 0 0.5rem;">Heard for <u>${esc(asgName)}</u> — tap ✕ to drop a line, then apply:</h3>`;
-
-  parsed.forEach((p, i) => {
-    if (p.ok) {
-      const what = stat(p.status)?.expects_score ? `score <b>${p.score}</b>` : `<b>${esc(p.status)}</b>`;
-      html += `<div class="review-item" data-i="${i}">
-        <div><span class="parsed">${esc(p.student.display_name)}</span> → ${what}
-          <div class="heard">heard: "${esc(p.heard)}"</div></div>
-        <button class="drop" data-drop="${i}">✕</button></div>`;
-    } else if (p.ambiguous) {
-      html += `<div class="review-item bad" data-i="${i}">
-        <div><span class="parsed">Two students match — which one?</span>
-          <div class="heard">heard: "${esc(p.heard)}"</div>
-          <div style="margin-top:0.35rem;display:flex;gap:0.35rem;flex-wrap:wrap">
-            ${p.ambiguous.map(s => `<button class="mini-btn cancel" data-pick="${i}" data-sid="${s.id}">${esc(s.display_name)}</button>`).join('')}
-          </div></div>
-        <button class="drop" data-drop="${i}">✕</button></div>`;
-    } else {
-      html += `<div class="review-item bad" data-i="${i}">
-        <div><span class="parsed">Didn't catch a student</span>
-          <div class="heard">heard: "${esc(p.heard)}"</div></div>
-        <button class="drop" data-drop="${i}">✕</button></div>`;
-    }
-  });
-
-  html += `<div class="apply-row"><button class="big-btn" id="applyBtn">✅ Apply to gradebook</button></div>`;
-  area.innerHTML = html;
-
-  area.querySelectorAll('[data-drop]').forEach(b => {
-    b.onclick = () => {
-      pendingGrades[+b.dataset.drop].dropped = true;
-      area.querySelector(`.review-item[data-i="${b.dataset.drop}"]`)?.remove();
-    };
-  });
-  // Disambiguation: tapping the right kid promotes the line to applicable.
-  area.querySelectorAll('[data-pick]').forEach(b => {
-    b.onclick = () => {
-      const p = pendingGrades[+b.dataset.pick];
-      p.student = state.students.find(s => s.id === b.dataset.sid);
-      p.ok = true;
-      p.status = p.status || defaultStatus();
-      p.score = p.status && !stat(p.status)?.expects_score ? null : p.score;
-      parseVoiceRerender();
-    };
-  });
-  $('applyBtn').onclick = applyParse;
+  renderReview();
 }
 
-/* Re-render the review list from the pending set, preserving drops/picks. */
-function parseVoiceRerender() {
-  const keep = pendingGrades;
+/* One renderer for the review list, used for the first pass and after every
+   drop or disambiguation tap. Nothing here writes to the gradebook — that only
+   happens on Apply, and that is not negotiable. */
+function renderReview() {
   const area = $('reviewArea');
   const asgName = state.assignments.find(a => a.id === $('voiceAsg').value)?.name || '';
-  let html = `<h3 style="font-size:0.95rem;margin:0.6rem 0 0.5rem;">Heard for <u>${esc(asgName)}</u> — tap ✕ to drop a line, then apply:</h3>`;
-  keep.forEach((p, i) => {
+  const live = pendingGrades.filter(p => !p.dropped);
+  const applicable = live.filter(p => p.ok).length;
+
+  let html = `<h3 style="font-size:0.95rem;margin:0.6rem 0 0.5rem;">
+    Heard for <u>${esc(asgName)}</u> — tap ✕ to drop a line, then apply:</h3>`;
+
+  pendingGrades.forEach((p, i) => {
     if (p.dropped) return;
+
     if (p.ok) {
       const what = stat(p.status)?.expects_score ? `score <b>${p.score}</b>` : `<b>${esc(p.status)}</b>`;
       html += `<div class="review-item" data-i="${i}">
         <div><span class="parsed">${esc(p.student.display_name)}</span> → ${what}
           <div class="heard">heard: "${esc(p.heard)}"</div></div>
         <button class="drop" data-drop="${i}">✕</button></div>`;
-    } else {
-      html += `<div class="review-item bad" data-i="${i}">
-        <div><span class="parsed">${p.ambiguous ? 'Two students match — which one?' : "Didn't catch a student"}</span>
-          <div class="heard">heard: "${esc(p.heard)}"</div>
-          ${p.ambiguous ? `<div style="margin-top:0.35rem;display:flex;gap:0.35rem;flex-wrap:wrap">
-            ${p.ambiguous.map(s => `<button class="mini-btn cancel" data-pick="${i}" data-sid="${s.id}">${esc(s.display_name)}</button>`).join('')}
-          </div>` : ''}
-        </div>
-        <button class="drop" data-drop="${i}">✕</button></div>`;
+      return;
     }
+
+    // Flagged. Say precisely what went wrong — a vague message here is how a
+    // wrong grade gets waved through.
+    let title, extra = '';
+    if (p.reason === 'ambiguous') {
+      title = 'Two students match — which one?';
+      extra = `<div style="margin-top:0.35rem;display:flex;gap:0.35rem;flex-wrap:wrap">
+        ${p.ambiguous.map(s => `<button class="mini-btn cancel" data-pick="${i}" data-sid="${s.id}">${esc(s.display_name)}</button>`).join('')}
+      </div>`;
+    } else if (p.reason === 'no-value') {
+      title = `Heard ${esc(p.student.display_name)}, but no score or status`;
+    } else {
+      title = "Didn't catch a student";
+    }
+
+    html += `<div class="review-item bad" data-i="${i}">
+      <div><span class="parsed">${title}</span>
+        <div class="heard">heard: "${esc(p.heard)}"</div>${extra}</div>
+      <button class="drop" data-drop="${i}">✕</button></div>`;
   });
-  html += `<div class="apply-row"><button class="big-btn" id="applyBtn">✅ Apply to gradebook</button></div>`;
+
+  html += `<div class="apply-row">
+    <button class="big-btn" id="applyBtn" ${applicable ? '' : 'disabled'}>
+      ✅ Apply ${applicable} grade${applicable === 1 ? '' : 's'} to gradebook
+    </button></div>`;
   area.innerHTML = html;
+
   area.querySelectorAll('[data-drop]').forEach(b => {
-    b.onclick = () => { pendingGrades[+b.dataset.drop].dropped = true; parseVoiceRerender(); };
+    b.onclick = () => { pendingGrades[+b.dataset.drop].dropped = true; renderReview(); };
   });
   area.querySelectorAll('[data-pick]').forEach(b => {
     b.onclick = () => {
       const p = pendingGrades[+b.dataset.pick];
       p.student = state.students.find(s => s.id === b.dataset.sid);
-      p.ok = true;
-      p.status = p.status || defaultStatus();
-      parseVoiceRerender();
+      p.ambiguous = null;
+      if (p.score == null && p.status == null) { p.reason = 'no-value'; }
+      else {
+        p.status = p.status || defaultStatus();
+        if (!stat(p.status)?.expects_score) p.score = null;
+        p.ok = true;
+      }
+      renderReview();
     };
   });
-  $('applyBtn').onclick = applyParse;
+  const btn = $('applyBtn');
+  if (btn && applicable) btn.onclick = applyParse;
 }
 
 async function applyParse() {

@@ -192,34 +192,179 @@ export function matchStudent(token, students) {
   return { student: null, ambiguous: hits };
 }
 
-/** Split a dictated line into chunks, one per student. */
+/** Split a dictated line into chunks, one per student.
+ *  Kept for the typed path and for tests; parseGrades no longer relies on it. */
 export function chunkUtterance(raw) {
   return String(raw || '').split(/,|\band\b|\.|;/i).map(c => c.trim()).filter(Boolean);
 }
 
-/** Full voice→grades parse. Returns one row per chunk, each either applicable
- *  (ok) or flagged for Traci. Nothing here writes anything. */
+/* ---------------------------------------------------------------------------
+   THE PARSE
+   ---------------------------------------------------------------------------
+   Speech recognition returns NO PUNCTUATION. Say "Marcus 88 Kayla absent Josh
+   missing Emma 39" and the Web Speech API hands back exactly that — one
+   unbroken string with not a comma in it. Any parser that splits on commas
+   therefore sees a single chunk, takes the first name and the first
+   score/status it trips over, and silently throws the rest away. Worse, it can
+   attach the WRONG value to the one name it found — marking Marcus "missing"
+   when he actually got an 88.
+
+   So we don't split on punctuation. We scan the words and let the ROSTER NAMES
+   themselves mark the boundaries: every recognised name opens a new grade, and
+   the score or status that follows attaches to it. Commas, when they exist, are
+   just whitespace. One code path for typed and dictated alike.
+--------------------------------------------------------------------------- */
+
+const TENS = { ninety: 90, eighty: 80, seventy: 70, sixty: 60, fifty: 50, forty: 40, thirty: 30, twenty: 20 };
+
+function tokenize(raw) {
+  return String(raw || '')
+    .replace(/[.,;!?]/g, ' ')
+    .replace(/-/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(t => ({ t, l: t.toLowerCase() }));
+}
+
+/** A number starting at i: "88", "seventy", "seventy eight", "one hundred". */
+function matchNumberAt(tk, i) {
+  const w = tk[i]?.l;
+  if (!w) return null;
+
+  if (/^\d{1,3}$/.test(w)) return { value: Math.min(100, Number(w)), len: 1 };
+
+  if ((w === 'one' || w === 'a') && tk[i + 1]?.l === 'hundred') return { value: 100, len: 2 };
+  if (w === 'hundred') return { value: 100, len: 1 };
+  if (w === 'zero') return { value: 0, len: 1 };
+
+  if (TENS[w] != null) {
+    const next = tk[i + 1]?.l;
+    if (ONES[next] != null) return { value: TENS[w] + ONES[next], len: 2 };
+    return { value: TENS[w], len: 1 };
+  }
+  if (w === 'ten') return { value: 10, len: 1 };
+  return null;
+}
+
+/** A status starting at i. Phrases are matched longest-first so "make up" wins
+ *  over a bare "up", and a status Traci adds later matches on its own name. */
+function matchStatusAt(tk, i, statuses) {
+  const phrases = [];
+  const synonyms = {
+    absent: ['absent', 'was out', 'not here', 'wasn\'t here'],
+    missing: ['missing', "didn't turn it in", "didn't turn it in", 'no work', 'nothing', 'never turned it in'],
+    makeup: ['makeup', 'make up', 'making it up'],
+  };
+  for (const st of statuses) {
+    if (st.expects_score) continue;                    // 'done' is not spoken
+    for (const p of (synonyms[st.code] || [])) phrases.push({ code: st.code, words: p.split(' ') });
+    phrases.push({ code: st.code, words: [st.code] }); // the status's own name
+  }
+  phrases.sort((a, b) => b.words.length - a.words.length);
+
+  for (const p of phrases) {
+    if (p.words.every((w, k) => tk[i + k]?.l === w)) return { code: p.code, len: p.words.length };
+  }
+  return null;
+}
+
+/** A roster name starting at i. Consumes a following last initial or last name
+ *  when one is there, so "Josh G" resolves and the "G" isn't left as noise. */
+function matchNameAt(tk, i, students) {
+  const w = tk[i]?.l;
+  if (!w) return null;
+
+  let hits = students.filter(s => s.first_name.toLowerCase() === w);
+  if (!hits.length) hits = students.filter(s => {
+    const f = s.first_name.toLowerCase();
+    return w.length > 2 && (w === f + "'s" || (f.startsWith(w) && w.length >= f.length - 1));
+  });
+  if (!hits.length) return null;
+
+  const next = tk[i + 1]?.l;
+  if (next) {
+    const narrowed = hits.filter(s => s.last_name &&
+      (next === s.last_name.toLowerCase() || next === s.last_name[0].toLowerCase()));
+    // Only consume the next token if it actually disambiguates or confirms.
+    if (narrowed.length === 1 && (hits.length > 1 || next.length === 1 || next === narrowed[0].last_name.toLowerCase())) {
+      return { students: narrowed, len: 2 };
+    }
+  }
+  return { students: hits, len: 1 };
+}
+
 export function parseGrades(raw, students, statuses) {
+  const tk = tokenize(raw);
   const defaultStatus = (statuses.find(s => s.expects_score) || statuses[0])?.code;
   const expects = code => !!statuses.find(s => s.code === code)?.expects_score;
+  const said = (a, b) => tk.slice(a, b).map(x => x.t).join(' ');
 
-  return chunkUtterance(raw).map(chunk => {
-    const lower = chunk.toLowerCase();
-    const status = detectStatus(lower, statuses);
-    const score = parseScore(lower);
-    const { student, ambiguous } = matchStudent(nameToken(chunk), students);
+  const entries = [];
+  let cur = null;
+  let spanStart = 0;                 // first token not yet accounted for
 
-    if (ambiguous) return { heard: chunk, ok: false, ambiguous, score, status };
-    if (student && (score != null || status)) {
-      const finalStatus = status || defaultStatus;
-      return {
-        heard: chunk, ok: true, student,
-        status: finalStatus,
-        score: expects(finalStatus) ? score : null,
-      };
+  const close = () => { if (cur) { entries.push(cur); spanStart = cur.end; cur = null; } };
+
+  for (let i = 0; i < tk.length;) {
+    const nm = matchNameAt(tk, i, students);
+    if (nm) {
+      close();
+      cur = { students: nm.students, score: null, status: null, start: i, end: i + nm.len };
+      i += nm.len;
+      continue;
     }
-    return { heard: chunk, ok: false, ambiguous: null, score, status };
-  }).filter(p => p.heard.length > 1);
+
+    const st = matchStatusAt(tk, i, statuses);
+    if (st) {
+      if (cur && cur.status == null && cur.score == null) {
+        cur.status = st.code; cur.end = i + st.len;
+      } else {
+        // A status with nobody to pin it on — or a second one for the same kid.
+        const from = cur ? (close(), spanStart) : spanStart;
+        entries.push({ orphan: true, status: st.code, score: null, start: from, end: i + st.len });
+        spanStart = i + st.len;
+      }
+      i += st.len;
+      continue;
+    }
+
+    const num = matchNumberAt(tk, i);
+    if (num) {
+      if (cur && cur.score == null && cur.status == null) {
+        cur.score = num.value; cur.end = i + num.len;
+      } else {
+        const from = cur ? (close(), spanStart) : spanStart;
+        entries.push({ orphan: true, score: num.value, status: null, start: from, end: i + num.len });
+        spanStart = i + num.len;
+      }
+      i += num.len;
+      continue;
+    }
+
+    i++;   // filler — "got", "a", "she", "apply that"
+  }
+  close();
+
+  return entries.map(e => {
+    const heard = said(e.start, e.end).trim();
+
+    if (e.orphan) {
+      return { heard, ok: false, ambiguous: null, reason: 'no-student', score: e.score, status: e.status };
+    }
+    if (e.students.length > 1) {
+      return { heard, ok: false, ambiguous: e.students, reason: 'ambiguous', score: e.score, status: e.status };
+    }
+    if (e.score == null && e.status == null) {
+      return { heard, ok: false, ambiguous: null, reason: 'no-value', student: e.students[0], score: null, status: null };
+    }
+
+    const finalStatus = e.status || defaultStatus;
+    return {
+      heard, ok: true, student: e.students[0],
+      status: finalStatus,
+      score: expects(finalStatus) ? e.score : null,
+    };
+  }).filter(p => p.heard.length > 0);
 }
 
 /** Names dictated for the roster: "add Avery Brooks, Marcus Davis". */
