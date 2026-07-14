@@ -441,6 +441,16 @@
         <button class="mini-btn danger" id="deleteClassBtn">Delete this class</button>
       </div>
     </div>
+
+    <div class="setup-block">
+      <h3>Demo class</h3>
+      <div class="note">
+        Adds a fresh pretend class — 10 made-up students, 8 assignments, a term of
+        grades. Handy for showing someone how it works without touching a real
+        roster. Adds a new period; it won't disturb the classes you already have.
+      </div>
+      <button class="mini-btn save" id="demoBtn2">🎒 Load a demo class</button>
+    </div>
   </section>
 
   <section class="panel" id="export">
@@ -1232,27 +1242,37 @@ const DEMO_ASSIGNMENTS = [
 ];
 
 async function loadDemoClass() {
-  $('demoBtn').disabled = true;
+  // Callable from the first-run screen and from Class Setup, so the demo can be
+  // reset at any time — not only on a brand-new account.
+  const btns = [$('demoBtn'), $('demoBtn2')];
+  btns.forEach(b => b && (b.disabled = true));
+  const done = () => btns.forEach(b => b && (b.disabled = false));
+
   $('setupMsg').className = 'msg ok';
   $('setupMsg').textContent = 'building the demo class…';
+  toast('building the demo class…');
 
-  const cls = await createClass('2nd Period — Pre-Algebra');
-  if (!cls) { $('demoBtn').disabled = false; return; }
+  // If a demo class is already here, give the new one a distinct name rather
+  // than silently making a confusing duplicate.
+  const base = '2nd Period — Pre-Algebra';
+  const taken = state.classes.filter(c => c.name.startsWith(base)).length;
+  const cls = await createClass(taken ? `${base} (${taken + 1})` : base);
+  if (!cls) { done(); return; }
 
   const topicNames = [...new Set(DEMO_ASSIGNMENTS.map(a => a[1]))];
   const tRes = await sb.from('topics').insert(topicNames.map(n => ({ class_id: cls.id, name: n }))).select();
-  if (!ok(tRes, 'seed topics')) return;
+  if (!ok(tRes, 'seed topics')) { done(); return; }
   const topicId = Object.fromEntries(tRes.data.map(t => [t.name, t.id]));
 
   const aRes = await sb.from('assignments').insert(DEMO_ASSIGNMENTS.map(([name, topic], i) => ({
     class_id: cls.id, name, topic_id: topicId[topic], points: 100, sort_order: i,
   }))).select();
-  if (!ok(aRes, 'seed assignments')) return;
+  if (!ok(aRes, 'seed assignments')) { done(); return; }
 
   const sRes = await sb.from('students').insert(DEMO_STUDENTS.map(([first_name, last_name], i) => ({
     class_id: cls.id, first_name, last_name, sort_order: i,
   }))).select();
-  if (!ok(sRes, 'seed students')) return;
+  if (!ok(sRes, 'seed students')) { done(); return; }
 
   // Same generator, same seed, same shape as the mockup Traci already saw.
   const asgByName = Object.fromEntries(aRes.data.map(a => [a.name, a]));
@@ -1290,14 +1310,17 @@ async function loadDemoClass() {
   pin('Kayla', 'HW 4.4', 'makeup');
 
   const cRes = await sb.from('cells').insert(rows);
-  if (!ok(cRes, 'seed grades')) return;
+  if (!ok(cRes, 'seed grades')) { done(); return; }
 
   await loadClasses();
   await switchClass(cls.id);
   showApp();
+  done();
+  $('setupMsg').textContent = '';
   toast('demo class loaded 🐎');
 }
 $('demoBtn').onclick = loadDemoClass;
+$('demoBtn2').onclick = loadDemoClass;
 
 $('createClassBtn').onclick = async () => {
   const name = $('newClassName').value.trim();
