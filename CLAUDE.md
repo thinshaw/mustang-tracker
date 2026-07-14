@@ -50,11 +50,23 @@ each student x assignment = one score + one status
   (student_id, assignment_id, status, score), classes/periods.
   Simple auth (email magic link is enough — single user initially).
 - Voice: Web Speech API live mic + iPad keyboard dictation into the same
-  textarea as guaranteed fallback. Current parser is regex-based
-  (handles digits, spoken numbers, "got a", "was absent"); acceptable
-  for v1. Phase 2: route messy utterances ("everyone got 100 except
-  Josh, he's missing") through the Anthropic API for parsing —
-  keep the same review-before-apply UI.
+  textarea as guaranteed fallback.
+
+  **SPEECH RECOGNITION RETURNS NO PUNCTUATION.** This is the single most
+  important fact about the voice feature. Say "Marcus 88, Kayla absent,
+  Josh missing" and the API hands back `Marcus 88 Kayla absent Josh
+  missing` — not one comma. The original parser split chunks on commas,
+  so dictation collapsed to a SINGLE grade and, worse, attached the
+  wrong value to it (Marcus came out "missing" when he'd got an 88) and
+  overwrote his real score on Apply. Do not reintroduce comma-splitting.
+
+  `parseGrades()` in lib.js now segments on the ROSTER NAMES themselves:
+  each recognised name opens a grade, the next score/status attaches to
+  it. Commas are just whitespace, so typed and dictated share one path.
+  Tested both ways in test/lib.test.mjs — keep it that way.
+
+  Phase 2: route messy utterances ("everyone got 100 except Josh, he's
+  missing") through the Anthropic API — keep review-before-apply.
 - Multiple class periods: mockup shows one period (2nd Period
   Pre-Algebra); real build needs a period switcher.
 
