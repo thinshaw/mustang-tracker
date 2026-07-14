@@ -11,5 +11,8 @@
 /private/
 *.local.csv
 
+# Supabase CLI local link state (machine-specific, includes pooler URL)
+supabase/.temp/
+
 # Node (only if a tool step is ever added)
 node_modules/
